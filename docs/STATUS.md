@@ -40,6 +40,32 @@ This document outlines the current purpose and state of the repository.
 * [List any tasks that are currently blocked and the reasons why.]
 * [Blocked Task 2]
 
+## Handover Information
+
+### Key Commands
+* [List essential commands for running, building, testing, or deploying the project. For example:
+    * `npm install`: To install project dependencies.
+    * `npm start`: To run the development server.
+    * `npm test`: To run unit tests.
+    * `docker-compose up`: To start services using Docker Compose.]
+* [Command 2]
+
+### Project Structure
+* [Provide a brief overview of the project's directory structure and the purpose of key directories. For example:
+    * `src/`: Contains the main application source code.
+    * `public/`: Static assets.
+    * `tests/`: Unit and integration tests.
+    * `docs/`: Documentation files.]
+* [Directory 2]
+
+### Current Setup
+* [Describe the current environment setup, including any specific software versions, configurations, or dependencies required. For example:
+    * Node.js version: v18.x
+    * Database: PostgreSQL 14
+    * Environment variables: `DATABASE_URL`, `API_KEY`
+    * Key configurations: `config/default.json`]
+* [Setup detail 2]
+
 ## Future Plans
 
 * [Outline any planned features or improvements.]
