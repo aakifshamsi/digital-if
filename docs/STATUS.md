@@ -26,6 +26,20 @@ This document outlines the current purpose and state of the repository.
 * [List any significant known bugs or limitations.]
 * [Issue 2]
 
+## Tasks
+
+### Immediate Tasks
+* [List tasks that need to be addressed right away.]
+* [Immediate Task 2]
+
+### Next Tasks
+* [List tasks that are planned for the near future.]
+* [Next Task 2]
+
+### Blocked Tasks
+* [List any tasks that are currently blocked and the reasons why.]
+* [Blocked Task 2]
+
 ## Future Plans
 
 * [Outline any planned features or improvements.]
