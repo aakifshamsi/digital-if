@@ -1,0 +1,57 @@
+{
+  "workspace": {
+    "name": "Luke",
+    "version": 1,
+    "updatedAt": "2026-03-19T00:00:00Z"
+  },
+  "defaultLane": {
+    "provider": "kilo-claw",
+    "purpose": [
+      "scaffolding",
+      "routine coding",
+      "iterative edits",
+      "bulk transforms"
+    ]
+  },
+  "fallbackLane": {
+    "provider": "openrouter",
+    "purpose": [
+      "cheap fallback",
+      "batch work",
+      "BYOK routing"
+    ]
+  },
+  "premiumManualLane": {
+    "providers": [
+      "chatgpt-plus",
+      "claude-plus"
+    ],
+    "purpose": [
+      "architecture",
+      "hard debugging",
+      "final review",
+      "reasoning escalation"
+    ],
+    "autonomousUse": false
+  },
+  "relay": {
+    "humanRelayEnabled": true,
+    "notes": "Use Kilo Human Relay for web ChatGPT/Claude access without default API spend when manual escalation is needed."
+  },
+  "portability": {
+    "exportModes": true,
+    "exportSkills": true,
+    "exportRules": true,
+    "gitBacked": true
+  },
+  "bridges": {
+    "simplex": {
+      "enabled": false,
+      "mode": "custom-bridge",
+      "notes": "KiloClaw docs currently list Telegram, Discord, and Slack. Use a custom SimpleX relay rather than expecting native KiloClaw SimpleX support."
+    }
+  },
+  "projects": [
+    "junkMoney"
+  ]
+}
