@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "Junkboy Monetize Companion",
+    "configVersion": 1,
+    "environment": "production",
+    "updatedAt": "2026-03-19T00:00:00Z"
+  },
+  "features": {
+    "adsEnabled": true,
+    "houseAdsEnabled": true,
+    "sponsorCardsEnabled": true,
+    "affiliateModulesEnabled": false,
+    "donationsEnabled": true,
+    "adFreeEntitlementEnabled": true,
+    "remoteAiBoostEnabled": true,
+    "contentPublishingEnabled": false
+  },
+  "placements": {
+    "dashboard": {
+      "enabled": true,
+      "provider": "house",
+      "label": "Sponsor",
+      "maxItems": 1
+    },
+    "settings": {
+      "enabled": true,
+      "provider": "sponsor",
+      "label": "Support",
+      "maxItems": 1
+    },
+    "stats": {
+      "enabled": false,
+      "provider": "affiliate",
+      "label": "Recommended",
+      "maxItems": 1
+    },
+    "messageList": {
+      "enabled": false,
+      "provider": "none",
+      "label": "",
+      "maxItems": 0
+    }
+  },
+  "donation": {
+    "minimumUsd": 1,
+    "allowCustomAmount": true,
+    "allowCrypto": true,
+    "note": "A prayer is also appreciated.",
+    "links": {
+      "stripe": "",
+      "paypal": "",
+      "btc": ""
+    }
+  },
+  "entitlements": {
+    "adFree": {
+      "enabled": true,
+      "durationDays": 3650
+    },
+    "remoteAiBoost": {
+      "enabled": true,
+      "dailyExtraRequests": 25,
+      "preferredProviders": [
+        "openrouter",
+        "claude",
+        "kimi"
+      ]
+    }
+  },
+  "providers": {
+    "house": {
+      "enabled": true,
+      "items": [
+        {
+          "title": "Support the project",
+          "body": "Donate to remove ads and unlock extra AI usage.",
+          "url": "",
+          "imageUrl": ""
+        }
+      ]
+    },
+    "sponsor": {
+      "enabled": false,
+      "items": []
+    },
+    "affiliate": {
+      "enabled": false,
+      "items": []
+    },
+    "adNetworkWeb": {
+      "enabled": false,
+      "network": "",
+      "slotId": "",
+      "notes": "Only use visible, policy-compliant web ad units."
+    },
+    "adNetworkAndroid": {
+      "enabled": false,
+      "network": "",
+      "unitId": "",
+      "format": "banner"
+    }
+  },
+  "content": {
+    "autopostEnabled": false,
+    "target": "github-pages",
+    "templates": [
+      {
+        "id": "daily-tip",
+        "title": "Daily spam-filter tip",
+        "enabled": true
+      }
+    ]
+  },
+  "moderation": {
+    "requireManualApproval": true,
+    "blockedKeywords": [
+      "adult",
+      "dating",
+      "meet singles"
+    ]
+  },
+  "privacy": {
+    "analyticsEnabled": false,
+    "storePersonalData": false,
+    "notes": "Keep message content on device. Remote config should not collect SMS bodies."
+  }
+}
