@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Junkboy Monetize Admin</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --muted: #8ea0bf;
+      --text: #edf2ff;
+      --line: #26324a;
+      --accent: #58a6ff;
+      --good: #3fb950;
+      --warn: #d29922;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1, h2, h3 { margin: 0 0 12px; }
+    .sub { color: var(--muted); margin-bottom: 18px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stack { display: grid; gap: 12px; }
+    label { display: grid; gap: 6px; font-size: 14px; }
+    input, select, textarea, button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0d1525;
+      color: var(--text);
+      padding: 10px 12px;
+    }
+    textarea { min-height: 180px; resize: vertical; }
+    button {
+      cursor: pointer;
+      background: #18233b;
+    }
+    button.primary {
+      background: var(--accent);
+      color: #051224;
+      border-color: transparent;
+      font-weight: 700;
+    }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #11203b; color: #9ecbff; font-size: 12px; margin-right: 8px; }
+    .ok { color: var(--good); }
+    .warn { color: var(--warn); }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0d1525;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      min-height: 280px;
+    }
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Junkboy Monetize Admin</h1>
+    <p class="sub">Static admin for a privacy-first monetization layer. Built for GitHub Pages or local use. Supports JSON export and optional save to a Cloudflare Worker endpoint.</p>
+
+    <div class="card" style="margin-bottom:20px;">
+      <span class="pill">Static</span>
+      <span class="pill">GitHub Pages friendly</span>
+      <span class="pill">Cloudflare Worker optional</span>
+      <p class="hint" style="margin-top:12px;">This admin is meant for compliant monetization. It does not implement deceptive ad rendering, invisible placements, or fake impression logic.</p>
+    </div>
+
+    <div class="grid">
+      <section class="card stack">
+        <h2>Controls</h2>
+        <div class="row">
+          <label>App name<input id="appName" value="Junkboy Monetize Companion"></label>
+          <label>Environment
+            <select id="environment">
+              <option value="production">production</option>
+              <option value="staging">staging</option>
+              <option value="development">development</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>Ads enabled
+            <select id="adsEnabled">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+          </label>
+          <label>Donation minimum (USD)<input id="minimumUsd" type="number" min="0" step="1" value="1"></label>
+        </div>
+        <div class="row">
+          <label>Dashboard provider
+            <select id="dashboardProvider">
+              <option value="house">house</option>
+              <option value="sponsor">sponsor</option>
+              <option value="affiliate">affiliate</option>
+              <option value="none">none</option>
+            </select>
+          </label>
+          <label>Settings provider
+            <select id="settingsProvider">
+              <option value="sponsor">sponsor</option>
+              <option value="house">house</option>
+              <option value="affiliate">affiliate</option>
+              <option value="none">none</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>Ad-free enabled
+            <select id="adFreeEnabled">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+          </label>
+          <label>Extra AI requests/day<input id="dailyExtraRequests" type="number" min="0" step="1" value="25"></label>
+        </div>
+        <label>House ad title<input id="houseTitle" value="Support the project"></label>
+        <label>House ad body<textarea id="houseBody">Donate to remove ads and unlock extra AI usage.</textarea></label>
+        <label>House ad URL<input id="houseUrl" placeholder="https://example.com/donate"></label>
+
+        <h3>Optional remote save</h3>
+        <div class="row">
+          <label>Worker endpoint<input id="workerUrl" placeholder="https://your-worker.example.workers.dev/config"></label>
+          <label>Admin token<input id="adminToken" type="password" placeholder="secret"></label>
+        </div>
+
+        <div class="toolbar">
+          <button class="primary" id="generateBtn">Generate JSON</button>
+          <button id="downloadBtn">Download JSON</button>
+          <button id="copyBtn">Copy JSON</button>
+          <button id="saveBtn">Save to Worker</button>
+        </div>
+        <div id="status" class="hint">Ready.</div>
+      </section>
+
+      <section class="card stack">
+        <h2>Config preview</h2>
+        <pre id="preview"></pre>
+        <div class="hint">
+          <div><span class="ok">Recommended:</span> use sponsor cards, donation links, and clearly labeled placements.</div>
+          <div><span class="warn">Avoid:</span> hidden ad slots, fake views, or adult/low-trust networks.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function getBool(id) {
+      return document.getElementById(id).value === 'true';
+    }
+
+    function buildConfig() {
+      return {
+        app: {
+          name: document.getElementById('appName').value.trim() || 'Junkboy Monetize Companion',
+          configVersion: 1,
+          environment: document.getElementById('environment').value,
+          updatedAt: new Date().toISOString()
+        },
+        features: {
+          adsEnabled: getBool('adsEnabled'),
+          houseAdsEnabled: true,
+          sponsorCardsEnabled: true,
+          affiliateModulesEnabled: false,
+          donationsEnabled: true,
+          adFreeEntitlementEnabled: getBool('adFreeEnabled'),
+          remoteAiBoostEnabled: true,
+          contentPublishingEnabled: false
+        },
+        placements: {
+          dashboard: {
+            enabled: true,
+            provider: document.getElementById('dashboardProvider').value,
+            label: 'Sponsor',
+            maxItems: 1
+          },
+          settings: {
+            enabled: true,
+            provider: document.getElementById('settingsProvider').value,
+            label: 'Support',
+            maxItems: 1
+          },
+          stats: {
+            enabled: false,
+            provider: 'affiliate',
+            label: 'Recommended',
+            maxItems: 1
+          },
+          messageList: {
+            enabled: false,
+            provider: 'none',
+            label: '',
+            maxItems: 0
+          }
+        },
+        donation: {
+          minimumUsd: Number(document.getElementById('minimumUsd').value || 1),
+          allowCustomAmount: true,
+          allowCrypto: true,
+          note: 'A prayer is also appreciated.',
+          links: {
+            stripe: '',
+            paypal: '',
+            btc: ''
+          }
+        },
+        entitlements: {
+          adFree: {
+            enabled: getBool('adFreeEnabled'),
+            durationDays: 3650
+          },
+          remoteAiBoost: {
+            enabled: true,
+            dailyExtraRequests: Number(document.getElementById('dailyExtraRequests').value || 25),
+            preferredProviders: ['openrouter', 'claude', 'kimi']
+          }
+        },
+        providers: {
+          house: {
+            enabled: true,
+            items: [{
+              title: document.getElementById('houseTitle').value.trim(),
+              body: document.getElementById('houseBody').value.trim(),
+              url: document.getElementById('houseUrl').value.trim(),
+              imageUrl: ''
+            }]
+          },
+          sponsor: { enabled: false, items: [] },
+          affiliate: { enabled: false, items: [] },
+          adNetworkWeb: {
+            enabled: false,
+            network: '',
+            slotId: '',
+            notes: 'Only use visible, policy-compliant web ad units.'
+          },
+          adNetworkAndroid: {
+            enabled: false,
+            network: '',
+            unitId: '',
+            format: 'banner'
+          }
+        },
+        privacy: {
+          analyticsEnabled: false,
+          storePersonalData: false,
+          notes: 'Keep message content on device. Remote config should not collect SMS bodies.'
+        }
+      };
+    }
+
+    function render() {
+      const json = JSON.stringify(buildConfig(), null, 2);
+      document.getElementById('preview').textContent = json;
+      return json;
+    }
+
+    function download(filename, text) {
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function saveToWorker() {
+      const status = document.getElementById('status');
+      const workerUrl = document.getElementById('workerUrl').value.trim();
+      const adminToken = document.getElementById('adminToken').value.trim();
+      if (!workerUrl || !adminToken) {
+        status.textContent = 'Worker URL and admin token are required for remote save.';
+        return;
+      }
+      status.textContent = 'Saving...';
+      try {
+        const res = await fetch(workerUrl, {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer ' + adminToken
+          },
+          body: render()
+        });
+        const text = await res.text();
+        status.textContent = res.ok ? 'Saved to Worker.' : 'Save failed: ' + text;
+      } catch (err) {
+        status.textContent = 'Save failed: ' + err.message;
+      }
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', render);
+    document.getElementById('downloadBtn').addEventListener('click', () => download('junkboy-config.json', render()));
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const status = document.getElementById('status');
+      try {
+        await navigator.clipboard.writeText(render());
+        status.textContent = 'JSON copied.';
+      } catch (err) {
+        status.textContent = 'Copy failed: ' + err.message;
+      }
+    });
+    document.getElementById('saveBtn').addEventListener('click', saveToWorker);
+    render();
+  </script>
+</body>
+</html>
