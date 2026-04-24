@@ -1,6 +1,8 @@
-# DigitalHands.in — AI Spa & Wellness Website Builder
+# dBeaver (working name) — DigitalHands Site Platform
 
-Envato-style AI website builder platform. First template: luxury spa & massage (Jacqueline-inspired).
+Generic AI-assisted website builder platform for multiple client verticals.
+Current demo template is spa & massage (Jacqueline-inspired), but the platform
+is not limited to spa businesses.
 
 ## Live Demo
 
@@ -93,7 +95,7 @@ Same as GitHub Pages. Drag-and-drop the `spa-builder/` folder.
 
 ## Customization
 
-### Change spa branding (client: massagedowntownvancouver.com)
+### Change demo client branding (current example: massagedowntownvancouver.com)
 
 Edit `demo/index.html`:
 - Business name, address, phone, hours
