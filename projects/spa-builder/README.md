@@ -112,14 +112,16 @@ Edit `demo/assets/css/main.css`:
 ### AI content
 
 The editor (`admin/editor.html` → AI tab) has demo AI responses.
-To wire up real AI, call the Anthropic Claude API from `api/ai.php`
-using the claude-sonnet-4-6 model.
+To wire up real AI on a zero-cost stack, add `api/ai.php` and route requests
+to a free/local provider such as:
+- Cloudflare Workers AI (free tier)
+- Ollama running local open models (via LAN/VPS/Oracle Free Tier later)
 
 ---
 
 ## Roadmap (v2.0)
 
-- [ ] Real Claude API integration for AI content
+- [ ] Real AI provider integration for content (Cloudflare Workers AI / Ollama)
 - [ ] More templates (hair salon, yoga, nutrition coach)
 - [ ] Drag-and-drop block editor
 - [ ] Custom domain mapping
