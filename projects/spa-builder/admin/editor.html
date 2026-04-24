@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Editor — DigitalHands.in Admin</title>
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🤝</text></svg>">
+  <style>
+    body { overflow: hidden; }
+    .editor-wrap { display: flex; height: calc(100vh - 64px); }
+    .editor-sidebar { width: 264px; flex-shrink:0; background:var(--navy-mid); border-right:1px solid var(--border); overflow-y:auto; }
+    .editor-main   { flex:1; display:flex; flex-direction:column; background:#0a0f1e; overflow:hidden; }
+    .editor-toolbar { display:flex; align-items:center; gap:8px; padding:8px 16px; background:var(--navy-mid); border-bottom:1px solid var(--border); flex-shrink:0; }
+    .editor-frame  { flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center; padding:20px; }
+    .editor-frame iframe { border:none; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5); transition:width .3s; }
+    .device-btn { background:var(--card-bg); border:1px solid var(--border); color:var(--text-mid); padding:5px 10px; border-radius:5px; cursor:pointer; font-size:.82rem; transition:all .2s; }
+    .device-btn.active { border-color:var(--blue); color:var(--blue-light); background:rgba(74,108,247,.1); }
+    .panel-tab { display:flex; border-bottom:1px solid var(--border); }
+    .panel-tab-btn { flex:1; padding:10px 0; font-size:.78rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; background:none; border:none; color:var(--text-dim); cursor:pointer; transition:color .2s; border-bottom:2px solid transparent; }
+    .panel-tab-btn.active { color:var(--blue-light); border-bottom-color:var(--blue); }
+    .panel-content { padding:16px; display:none; }
+    .panel-content.active { display:block; }
+    .field-row { margin-bottom:14px; }
+    .field-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:5px; display:block; }
+    .field-input { background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:5px; padding:8px 10px; color:var(--text); font-size:.85rem; width:100%; outline:none; }
+    .field-input:focus { border-color:var(--blue); }
+    .field-color { display:flex; align-items:center; gap:8px; }
+    .field-color input[type=color] { width:36px; height:28px; padding:2px; border:1px solid var(--border); border-radius:4px; background:none; cursor:pointer; }
+    .page-nav { display:flex; flex-direction:column; gap:4px; padding:12px; }
+    .page-nav-btn { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; background:none; border:none; color:var(--text-mid); font-size:.84rem; cursor:pointer; width:100%; text-align:left; transition:all .2s; }
+    .page-nav-btn:hover { background:var(--card-hover); color:var(--text); }
+    .page-nav-btn.active { background:rgba(74,108,247,.12); color:var(--blue-light); }
+    .ai-btn { background:linear-gradient(135deg,#7c3aed,#4a6cf7); border:none; color:#fff; padding:9px 14px; border-radius:6px; font-size:.8rem; cursor:pointer; width:100%; margin-bottom:8px; transition:all .2s; }
+    .ai-btn:hover { opacity:.88; transform:translateY(-1px); }
+  </style>
+</head>
+<body>
+<div class="admin-layout" style="display:flex; flex-direction:column;">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a href="dashboard.html" style="color:var(--text-dim); font-size:.85rem; margin-right:12px;">← Dashboard</a>
+    <div class="topbar-title" id="editor-title">Site Editor — Serenity Spa</div>
+    <div class="topbar-actions">
+      <select id="client-select" class="topbar-btn" style="cursor:pointer; max-width:200px;"></select>
+      <button class="topbar-btn" onclick="showToast('Changes saved!','success')">💾 Save</button>
+      <button class="topbar-btn topbar-btn-primary" onclick="window.open('../demo/index.html','_blank')">
+        🌐 Preview Live
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-wrap">
+
+    <!-- Left panel -->
+    <div class="editor-sidebar">
+      <div class="panel-tab">
+        <button class="panel-tab-btn active" onclick="switchTab(this,'pages')">Pages</button>
+        <button class="panel-tab-btn" onclick="switchTab(this,'style')">Style</button>
+        <button class="panel-tab-btn" onclick="switchTab(this,'content')">Content</button>
+        <button class="panel-tab-btn" onclick="switchTab(this,'ai')">AI ✨</button>
+      </div>
+
+      <!-- Pages Tab -->
+      <div class="panel-content active" id="tab-pages">
+        <div class="page-nav">
+          <button class="page-nav-btn active" onclick="loadPage('index.html',this)">🏠 Home</button>
+          <button class="page-nav-btn" onclick="loadPage('services.html',this)">💆 Services</button>
+          <button class="page-nav-btn" onclick="loadPage('about.html',this)">ℹ️ About</button>
+          <button class="page-nav-btn" onclick="loadPage('booking.html',this)">📅 Booking</button>
+          <button class="page-nav-btn" onclick="loadPage('contact.html',this)">📞 Contact</button>
+        </div>
+        <div style="padding:0 12px 12px">
+          <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Add Page</div>
+          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;"
+            onclick="showToast('Page creation — coming in v2.0','info')">+ New Page</button>
+        </div>
+      </div>
+
+      <!-- Style Tab -->
+      <div class="panel-content" id="tab-style">
+        <div style="padding:4px 0 8px">
+          <div class="field-row">
+            <label class="field-label">Primary Color (Green)</label>
+            <div class="field-color">
+              <input type="color" id="c-primary" value="#1a3a2a" oninput="applyColor('--green-deep', this.value)">
+              <input type="text" class="field-input" id="c-primary-hex" value="#1a3a2a" style="flex:1;"
+                onchange="document.getElementById('c-primary').value=this.value; applyColor('--green-deep',this.value)">
+            </div>
+          </div>
+          <div class="field-row">
+            <label class="field-label">Accent Color (Gold)</label>
+            <div class="field-color">
+              <input type="color" id="c-gold" value="#c9a96e" oninput="applyColor('--gold', this.value)">
+              <input type="text" class="field-input" id="c-gold-hex" value="#c9a96e" style="flex:1;"
+                onchange="document.getElementById('c-gold').value=this.value; applyColor('--gold',this.value)">
+            </div>
+          </div>
+          <div class="field-row">
+            <label class="field-label">Background (Cream)</label>
+            <div class="field-color">
+              <input type="color" id="c-bg" value="#faf7f2" oninput="applyColor('--cream', this.value)">
+              <input type="text" class="field-input" id="c-bg-hex" value="#faf7f2" style="flex:1;"
+                onchange="document.getElementById('c-bg').value=this.value; applyColor('--cream',this.value)">
+            </div>
+          </div>
+          <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
+          <div class="field-row">
+            <label class="field-label">Font Family</label>
+            <select class="field-input" id="font-family" onchange="applyFont(this.value)">
+              <option value="Georgia, serif">Georgia (Elegant)</option>
+              <option value="'Playfair Display', serif">Playfair Display</option>
+              <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+              <option value="'Lato', sans-serif">Lato (Modern)</option>
+              <option value="'Montserrat', sans-serif">Montserrat</option>
+            </select>
+          </div>
+          <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
+          <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Presets</div>
+          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;" onclick="applyPreset('classic')">🌿 Classic Green & Gold</button>
+          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;" onclick="applyPreset('ocean')">🌊 Ocean Blue & Sand</button>
+          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;" onclick="applyPreset('rose')">🌸 Rose & Blush</button>
+          <button class="topbar-btn" style="width:100%; font-size:.78rem;" onclick="applyPreset('midnight')">🌙 Midnight Luxury</button>
+        </div>
+      </div>
+
+      <!-- Content Tab -->
+      <div class="panel-content" id="tab-content">
+        <div>
+          <div class="field-row">
+            <label class="field-label">Business Name</label>
+            <input type="text" class="field-input" id="biz-name" value="Serenity Spa & Massage"
+              oninput="debounceUpdate('name', this.value)">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Tagline</label>
+            <input type="text" class="field-input" id="biz-tagline" value="Spa & Massage · Vancouver"
+              oninput="debounceUpdate('tagline', this.value)">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Hero Headline</label>
+            <textarea class="field-input" rows="3" id="biz-hero">Restore Your Body, Renew Your Spirit</textarea>
+          </div>
+          <div class="field-row">
+            <label class="field-label">Phone Number</label>
+            <input type="text" class="field-input" id="biz-phone" value="(604) 200-1234">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Address</label>
+            <input type="text" class="field-input" id="biz-address" value="789 Granville St, #200, Vancouver BC">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Email</label>
+            <input type="email" class="field-input" id="biz-email" value="hello@serenityspa.ca">
+          </div>
+          <button class="topbar-btn topbar-btn-primary" style="width:100%; margin-top:8px;"
+            onclick="showToast('Content saved to template!','success')">Save Content</button>
+        </div>
+      </div>
+
+      <!-- AI Tab -->
+      <div class="panel-content" id="tab-ai">
+        <div style="margin-bottom:12px; font-size:.82rem; color:var(--text-mid); line-height:1.6;">
+          Let AI write copy, generate service descriptions, and optimize SEO for your client's site.
+        </div>
+        <button class="ai-btn" onclick="aiAction('headline')">✨ Generate Hero Headline</button>
+        <button class="ai-btn" onclick="aiAction('about')">✨ Write About Section</button>
+        <button class="ai-btn" onclick="aiAction('services')">✨ Generate Service Descriptions</button>
+        <button class="ai-btn" onclick="aiAction('seo')">🔍 Optimize Meta / SEO</button>
+        <button class="ai-btn" onclick="aiAction('social')">📱 Write Social Media Posts</button>
+        <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
+        <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Custom Prompt</div>
+        <textarea class="field-input" id="ai-prompt" rows="3" placeholder="e.g. Write a welcome paragraph for a luxury spa in Vancouver…"></textarea>
+        <button class="ai-btn" style="margin-top:8px" onclick="aiCustom()">✨ Generate</button>
+        <div id="ai-output" style="display:none; margin-top:12px; background:rgba(124,58,237,.08); border:1px solid rgba(124,58,237,.2); border-radius:6px; padding:12px; font-size:.83rem; color:var(--text-mid); line-height:1.7;"></div>
+      </div>
+    </div>
+
+    <!-- Editor canvas -->
+    <div class="editor-main">
+      <div class="editor-toolbar">
+        <button class="device-btn active" onclick="setDevice('desktop',this)" title="Desktop">🖥</button>
+        <button class="device-btn" onclick="setDevice('tablet',this)" title="Tablet">📱</button>
+        <button class="device-btn" onclick="setDevice('mobile',this)" title="Mobile">📲</button>
+        <div style="flex:1; text-align:center;">
+          <span style="font-size:.78rem; color:var(--text-dim); font-family:monospace" id="frame-url">
+            demo/index.html
+          </span>
+        </div>
+        <button class="device-btn" onclick="reloadFrame()" title="Refresh">🔄</button>
+        <button class="device-btn" onclick="window.open(document.getElementById('preview-frame').src,'_blank')" title="Open in new tab">↗</button>
+      </div>
+      <div class="editor-frame" id="editor-frame">
+        <iframe
+          id="preview-frame"
+          src="../demo/index.html"
+          width="100%"
+          height="900"
+          title="Site Preview"
+        ></iframe>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/js/admin.js"></script>
+<script>
+// ── Populate client selector ──
+document.addEventListener('DOMContentLoaded', function() {
+  const sel = document.getElementById('client-select');
+  window.getClients().forEach(function(c) {
+    const opt = document.createElement('option');
+    opt.value = c.id; opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', function() {
+    const c = window.getClients().find(x => x.id === this.value);
+    if (c) {
+      document.getElementById('editor-title').textContent = 'Site Editor — ' + c.name;
+      showToast('Loaded: ' + c.name, 'info');
+    }
+  });
+});
+
+// ── Tab switching ──
+function switchTab(btn, id) {
+  document.querySelectorAll('.panel-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ── Page navigation ──
+function loadPage(page, btn) {
+  document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const frame = document.getElementById('preview-frame');
+  frame.src = '../demo/' + page;
+  document.getElementById('frame-url').textContent = 'demo/' + page;
+}
+
+// ── Device preview ──
+function setDevice(type, btn) {
+  document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const frame = document.getElementById('preview-frame');
+  const sizes = { desktop: '100%', tablet: '768px', mobile: '390px' };
+  frame.style.width  = sizes[type];
+  frame.style.height = type === 'desktop' ? '900px' : '700px';
+}
+
+function reloadFrame() {
+  const f = document.getElementById('preview-frame');
+  f.src = f.src;
+}
+
+// ── Color theme ──
+function applyColor(varName, val) {
+  // Update hex input sync
+  const hexId = varName === '--green-deep' ? 'c-primary-hex' : varName === '--gold' ? 'c-gold-hex' : 'c-bg-hex';
+  const hexEl = document.getElementById(hexId);
+  if (hexEl && document.activeElement !== hexEl) hexEl.value = val;
+  showToast('Color updated — reload preview to see changes.', 'info');
+}
+
+function applyFont(val) {
+  showToast('Font set to: ' + val.split(',')[0], 'info');
+}
+
+const presets = {
+  classic:  { '--green-deep':'#1a3a2a', '--gold':'#c9a96e', '--cream':'#faf7f2' },
+  ocean:    { '--green-deep':'#0d3b5e', '--gold':'#e8c96d', '--cream':'#f5f8fa' },
+  rose:     { '--green-deep':'#4a1942', '--gold':'#e8899a', '--cream':'#fdf5f6' },
+  midnight: { '--green-deep':'#080c18', '--gold':'#e2c073', '--cream':'#f0ede8' }
+};
+function applyPreset(name) {
+  const p = presets[name];
+  if (!p) return;
+  document.getElementById('c-primary').value = p['--green-deep'];
+  document.getElementById('c-primary-hex').value = p['--green-deep'];
+  document.getElementById('c-gold').value = p['--gold'];
+  document.getElementById('c-gold-hex').value = p['--gold'];
+  document.getElementById('c-bg').value = p['--cream'];
+  document.getElementById('c-bg-hex').value = p['--cream'];
+  showToast('Preset applied! Reload preview to see.', 'success');
+}
+
+// ── Content update ──
+let _debounceTimer;
+function debounceUpdate(field, val) {
+  clearTimeout(_debounceTimer);
+  _debounceTimer = setTimeout(function() {
+    showToast('Content saved: ' + field, 'success');
+  }, 800);
+}
+
+// ── AI content generation (demo) ──
+const AI_SAMPLES = {
+  headline: 'Your Journey to Total Wellness Begins Here — Premium Massage & Spa Treatments in Downtown Vancouver.',
+  about: 'Nestled in the heart of Vancouver\'s vibrant downtown, Serenity Spa has been the city\'s most-trusted sanctuary for therapeutic massage and holistic wellness since 2012. Our team of registered massage therapists brings artistry, intuition, and clinical expertise to every session — crafting personalized treatments that go far beyond relaxation.',
+  services: 'Swedish Massage: Long, flowing strokes melt away the stress of modern life, leaving you refreshed and recharged. Deep Tissue Massage: Targeted pressure on stubborn knots and chronic tension zones — the treatment that keeps Vancouver\'s professionals moving. Hot Stone Therapy: Ancient volcanic basalt stones, heated to perfection, carry warmth deep into muscles that no hands alone can reach.',
+  seo: 'Meta title: "Best Massage Therapy in Downtown Vancouver | Serenity Spa" | Meta description: "Award-winning massage & spa treatments in Vancouver BC. Swedish, deep tissue, prenatal & hot stone. Book online — same-day available." | Keywords: massage downtown vancouver, spa vancouver, registered massage therapist, hot stone massage, prenatal massage.',
+  social: '✨ Feeling tense? We\'ve got you. 🌿 Our 90-min deep tissue massage is the reset your body has been craving — and your first visit is 15% off. Book at the link in bio. #VancouverSpa #MassageVancouver #Wellness #SelfCare'
+};
+
+function aiAction(type) {
+  const out = document.getElementById('ai-output');
+  out.style.display = 'block';
+  out.innerHTML = '<em style="color:var(--text-dim)">⏳ Generating with AI…</em>';
+  setTimeout(function() {
+    out.innerHTML = '<strong style="color:var(--cyan); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;">' + type.toUpperCase() + '</strong><br><br>' + AI_SAMPLES[type];
+    showToast('AI content generated!', 'success');
+  }, 1200);
+}
+
+function aiCustom() {
+  const prompt = document.getElementById('ai-prompt').value.trim();
+  if (!prompt) { showToast('Please enter a prompt first.', 'error'); return; }
+  const out = document.getElementById('ai-output');
+  out.style.display = 'block';
+  out.innerHTML = '<em style="color:var(--text-dim)">⏳ Generating…</em>';
+  setTimeout(function() {
+    out.innerHTML = '<strong style="color:var(--cyan); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;">AI Response</strong><br><br>At Serenity Spa, every treatment is a journey — from the moment you step through our doors, you\'re invited to leave the outside world behind. Whether you seek relief from chronic tension, a moment of pure indulgence, or the nurturing care of prenatal massage, our team is here to craft an experience that is uniquely, completely yours.';
+    showToast('AI content generated!', 'success');
+  }, 1400);
+}
+</script>
+</body>
+</html>

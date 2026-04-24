@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Templates — DigitalHands.in Admin</title>
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🤝</text></svg>">
+  <style>
+    .tmpl-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px; }
+    .tmpl-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; transition:all var(--transition); }
+    .tmpl-card:hover { border-color:rgba(74,108,247,.4); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,.3); }
+    .tmpl-thumb { height:180px; background:linear-gradient(135deg,#1a3a2a,#2d5a3d); display:flex; align-items:center; justify-content:center; font-size:3.5rem; position:relative; overflow:hidden; }
+    .tmpl-thumb img { width:100%; height:100%; object-fit:cover; opacity:.7; }
+    .tmpl-badge { position:absolute; top:10px; right:10px; }
+    .tmpl-body { padding:18px; }
+    .tmpl-name { font-weight:700; margin-bottom:.3rem; }
+    .tmpl-desc { font-size:.82rem; color:var(--text-mid); margin-bottom:12px; }
+    .tmpl-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .tmpl-tag { background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:20px; font-size:.7rem; padding:3px 10px; color:var(--text-dim); }
+    .tmpl-actions { display:flex; gap:8px; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">🤝</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">DigitalHands.in</div>
+        <div class="sidebar-brand-tag">Website Builder</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <a href="dashboard.html" class="sidebar-link"><span class="sidebar-link-icon">📊</span> Dashboard</a>
+      <a href="clients.html"   class="sidebar-link"><span class="sidebar-link-icon">👥</span> Clients</a>
+      <a href="editor.html"    class="sidebar-link"><span class="sidebar-link-icon">✏️</span> Site Editor</a>
+      <a href="templates.html" class="sidebar-link"><span class="sidebar-link-icon">🎨</span> Templates</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Shortcuts</div>
+      <a href="../demo/index.html" target="_blank" class="sidebar-link"><span class="sidebar-link-icon">🌐</span> View Demo Site</a>
+      <a href="../client/login.html" target="_blank" class="sidebar-link"><span class="sidebar-link-icon">🔑</span> Client Portal</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="doLogout()">
+        <div class="sidebar-avatar" id="sidebar-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Admin</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Loading…</div>
+        </div>
+        <span style="color:var(--text-dim); margin-left:auto; font-size:.8rem;">⏏</span>
+      </div>
+    </div>
+  </aside>
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">Templates</div>
+      <div class="topbar-actions">
+        <button class="topbar-btn topbar-btn-primary" onclick="showToast('New template builder — coming in v2.0!','info')">
+          + Create Template
+        </button>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="tmpl-grid">
+
+        <div class="tmpl-card">
+          <div class="tmpl-thumb" style="background:linear-gradient(135deg,#1a3a2a,#2d5a3d)">
+            🌿
+            <div class="tmpl-badge"><span class="badge badge-green">Active</span></div>
+          </div>
+          <div class="tmpl-body">
+            <div class="tmpl-name">Serenity — Spa &amp; Massage</div>
+            <div class="tmpl-desc">Luxury spa template inspired by Jacqueline theme. 5 pages, booking form, team section, testimonials.</div>
+            <div class="tmpl-tags">
+              <span class="tmpl-tag">Spa</span>
+              <span class="tmpl-tag">Wellness</span>
+              <span class="tmpl-tag">Massage</span>
+              <span class="tmpl-tag">5 Pages</span>
+              <span class="tmpl-tag">Mobile Ready</span>
+            </div>
+            <div class="tmpl-actions">
+              <button class="topbar-btn topbar-btn-primary" onclick="window.open('../demo/index.html','_blank')">Preview</button>
+              <button class="topbar-btn" onclick="window.location.href='editor.html'">Edit</button>
+              <button class="topbar-btn" onclick="window.location.href='clients.html'">Assign</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tmpl-card" style="opacity:.6;">
+          <div class="tmpl-thumb" style="background:linear-gradient(135deg,#1e3a5f,#2d6a9f)">
+            💇
+            <div class="tmpl-badge"><span class="badge badge-yellow">Coming Soon</span></div>
+          </div>
+          <div class="tmpl-body">
+            <div class="tmpl-name">Luxe — Hair &amp; Beauty Salon</div>
+            <div class="tmpl-desc">Modern beauty salon template with service menu, stylists, gallery, and appointment booking.</div>
+            <div class="tmpl-tags">
+              <span class="tmpl-tag">Beauty</span>
+              <span class="tmpl-tag">Hair</span>
+              <span class="tmpl-tag">Salon</span>
+            </div>
+            <div class="tmpl-actions">
+              <button class="topbar-btn" onclick="showToast('Coming in v2.0!','info')">Preview</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tmpl-card" style="opacity:.6;">
+          <div class="tmpl-thumb" style="background:linear-gradient(135deg,#3d1a5e,#6a2d9f)">
+            🧘
+            <div class="tmpl-badge"><span class="badge badge-yellow">Coming Soon</span></div>
+          </div>
+          <div class="tmpl-body">
+            <div class="tmpl-name">Zen — Yoga &amp; Fitness</div>
+            <div class="tmpl-desc">Clean yoga studio template with class schedule, instructors, and membership plans.</div>
+            <div class="tmpl-tags">
+              <span class="tmpl-tag">Yoga</span>
+              <span class="tmpl-tag">Fitness</span>
+              <span class="tmpl-tag">Wellness</span>
+            </div>
+            <div class="tmpl-actions">
+              <button class="topbar-btn" onclick="showToast('Coming in v2.0!','info')">Preview</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tmpl-card" style="opacity:.6;">
+          <div class="tmpl-thumb" style="background:linear-gradient(135deg,#1a3d2a,#2d8a5e)">
+            🥗
+            <div class="tmpl-badge"><span class="badge badge-yellow">Coming Soon</span></div>
+          </div>
+          <div class="tmpl-body">
+            <div class="tmpl-name">Bloom — Nutrition &amp; Health</div>
+            <div class="tmpl-desc">Health coach and nutritionist template with blog, programs, and intake forms.</div>
+            <div class="tmpl-tags">
+              <span class="tmpl-tag">Health</span>
+              <span class="tmpl-tag">Nutrition</span>
+              <span class="tmpl-tag">Blog</span>
+            </div>
+            <div class="tmpl-actions">
+              <button class="topbar-btn" onclick="showToast('Coming in v2.0!','info')">Preview</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

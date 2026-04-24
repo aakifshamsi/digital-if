@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Website — Client Portal</title>
+  <link rel="stylesheet" href="assets/css/client.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌿</text></svg>">
+</head>
+<body>
+
+<!-- Header -->
+<header class="portal-header">
+  <div class="portal-logo">
+    <span style="font-size:1.4rem">🌿</span>
+    <div>
+      <div class="portal-logo-text" id="client-name">My Spa</div>
+      <span class="portal-logo-sub">Client Portal · DigitalHands.in</span>
+    </div>
+  </div>
+  <div class="portal-header-right">
+    <span class="portal-user" id="portal-user-email">Loading…</span>
+    <button class="portal-logout" onclick="doLogout()">Sign Out</button>
+  </div>
+</header>
+
+<!-- Body -->
+<div class="portal-body">
+
+  <!-- Welcome -->
+  <div class="portal-welcome">
+    <div>
+      <h2>Welcome back! 👋</h2>
+      <p id="portal-welcome-sub">Your website is live and performing well.</p>
+    </div>
+    <button class="portal-cta" onclick="window.open('../demo/index.html','_blank')">
+      🌐 View My Website
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="portal-stats">
+    <div class="p-stat">
+      <div class="p-stat-num">247</div>
+      <div class="p-stat-label">Visitors this month</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat-num">18</div>
+      <div class="p-stat-label">Booking requests</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat-num">4.9★</div>
+      <div class="p-stat-label">Google rating</div>
+    </div>
+    <div class="p-stat">
+      <div class="p-stat-num">100%</div>
+      <div class="p-stat-label">Uptime this month</div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="portal-grid">
+
+    <!-- Site preview -->
+    <div class="portal-card">
+      <div class="portal-card-header">
+        <span class="portal-card-title">🌐 Your Website</span>
+        <span style="font-size:.78rem; color:#888;" id="site-domain">massagedowntownvancouver.com</span>
+      </div>
+      <div class="portal-card-body">
+        <div class="site-preview-thumb">
+          <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&q=60" alt="">
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px">
+          <span style="background:#dcfce7; color:#166534; font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:20px;">
+            ✅ Live
+          </span>
+          <span style="background:#fef9c3; color:#854d0e; font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:20px;">
+            📄 5 Pages
+          </span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:20px;">
+            📱 Mobile Ready
+          </span>
+        </div>
+        <div style="display:flex; gap:8px">
+          <button class="cp-btn" style="flex:1; padding:10px;"
+            onclick="window.open('../demo/index.html','_blank')">
+            View Site
+          </button>
+          <button style="flex:1; padding:10px; background:#f5f0e8; color:#1a3a2a; border:none; border-radius:7px; font-size:.88rem; font-weight:600; cursor:pointer;"
+            onclick="contactSupport()">
+            Request Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div>
+      <div class="portal-card" style="margin-bottom:16px">
+        <div class="portal-card-header">
+          <span class="portal-card-title">⚡ Quick Actions</span>
+        </div>
+        <div class="portal-card-body">
+          <div class="action-list">
+            <div class="action-item" onclick="window.open('../demo/index.html','_blank')">
+              <span class="action-icon">🌐</span>
+              <div>
+                <div class="action-text">View Live Website</div>
+                <div class="action-sub">Open your site in a new tab</div>
+              </div>
+            </div>
+            <div class="action-item" onclick="window.open('../demo/booking.html','_blank')">
+              <span class="action-icon">📅</span>
+              <div>
+                <div class="action-text">Preview Booking Page</div>
+                <div class="action-sub">See how clients book</div>
+              </div>
+            </div>
+            <div class="action-item" onclick="contactSupport()">
+              <span class="action-icon">✏️</span>
+              <div>
+                <div class="action-text">Request Content Update</div>
+                <div class="action-sub">Change text, photos, hours</div>
+              </div>
+            </div>
+            <div class="action-item" onclick="contactSupport()">
+              <span class="action-icon">📊</span>
+              <div>
+                <div class="action-text">View Analytics Report</div>
+                <div class="action-sub">Monthly traffic summary</div>
+              </div>
+            </div>
+            <div class="action-item" onclick="contactSupport()">
+              <span class="action-icon">🆘</span>
+              <div>
+                <div class="action-text">Contact Support</div>
+                <div class="action-sub">Mon–Fri 9am–6pm IST</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <div class="portal-card-header">
+          <span class="portal-card-title">📦 Your Plan</span>
+        </div>
+        <div class="portal-card-body">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <div>
+              <div style="font-weight:700; color:#1a3a2a; font-size:1.05rem" id="client-plan">Professional</div>
+              <div style="font-size:.78rem; color:#888; margin-top:2px">Renews monthly</div>
+            </div>
+            <span style="background:#dcfce7; color:#166534; font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:20px;">Active</span>
+          </div>
+          <div style="font-size:.82rem; color:#666; display:flex; flex-direction:column; gap:6px;">
+            <div>✅ 5-page website</div>
+            <div>✅ Mobile responsive</div>
+            <div>✅ Online booking form</div>
+            <div>✅ SSL certificate</div>
+            <div>✅ Monthly updates</div>
+            <div>✅ Priority support</div>
+          </div>
+          <div style="margin-top:14px; padding-top:14px; border-top:1px solid #eee; font-size:.78rem; color:#aaa; text-align:center;">
+            Managed by <a href="https://digitalhands.in" target="_blank" style="color:#c9a96e">DigitalHands.in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent messages -->
+  <div class="portal-card" style="margin-top:20px">
+    <div class="portal-card-header">
+      <span class="portal-card-title">📬 Recent Messages from DigitalHands</span>
+    </div>
+    <div class="portal-card-body">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="padding:14px; background:#f9f7f4; border-radius:8px; border-left:3px solid #c9a96e;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+            <strong style="font-size:.87rem; color:#1a3a2a;">Your site is live! 🎉</strong>
+            <span style="font-size:.75rem; color:#aaa;">2 days ago</span>
+          </div>
+          <p style="font-size:.84rem; color:#666; margin:0;">
+            Hi! Your new website is now live at massagedowntownvancouver.com. Let us know if you'd like to update any content.
+          </p>
+        </div>
+        <div style="padding:14px; background:#f9f7f4; border-radius:8px; border-left:3px solid #4a6cf7;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+            <strong style="font-size:.87rem; color:#1a3a2a;">Monthly report ready</strong>
+            <span style="font-size:.75rem; color:#aaa;">8 days ago</span>
+          </div>
+          <p style="font-size:.84rem; color:#666; margin:0;">
+            Your April report shows 247 visitors and 18 booking form submissions. Traffic is up 32% from last month.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="powered-by">
+  Client portal by <a href="https://digitalhands.in" target="_blank">DigitalHands.in</a> — AI-powered websites for wellness businesses
+</div>
+
+<script>
+(function() {
+  if (sessionStorage.getItem('dh_client_auth') !== 'true') {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const raw = sessionStorage.getItem('dh_client_data');
+  if (raw) {
+    const c = JSON.parse(raw);
+    document.getElementById('client-name').textContent     = c.name || 'My Business';
+    document.getElementById('portal-user-email').textContent = c.login ? c.login.email : '';
+    document.getElementById('site-domain').textContent     = c.domain || '';
+    document.getElementById('portal-welcome-sub').textContent = 'Your website is live at ' + (c.domain || 'your domain') + '.';
+    if (c.plan) document.getElementById('client-plan').textContent = c.plan;
+  }
+
+  window.doLogout = function() {
+    sessionStorage.removeItem('dh_client_auth');
+    sessionStorage.removeItem('dh_client_data');
+    window.location.href = 'login.html';
+  };
+
+  window.contactSupport = function() {
+    alert('Contact DigitalHands.in support:\n\nEmail: support@digitalhands.in\nWhatsApp: +91 XXXXX XXXXX\nHours: Mon–Fri 9am–6pm IST');
+  };
+})();
+</script>
+</body>
+</html>
