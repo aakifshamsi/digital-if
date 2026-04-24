@@ -21,7 +21,7 @@ Open `index.html` for the full navigation hub.
 ## Project Structure
 
 ```
-spa-builder/
+dbeaver/
 ├── index.html              ← Platform hub / entry point
 ├── .htaccess               ← Apache config (shared hosting)
 ├── demo/                   ← Spa template (massagedowntownvancouver.com style)
@@ -63,7 +63,7 @@ Auth uses `sessionStorage` + `localStorage` (client-side only, demo-grade).
 
 ```bash
 # From repo root
-git subtree push --prefix=projects/spa-builder origin gh-pages
+git subtree push --prefix=projects/dbeaver origin gh-pages
 ```
 
 Then enable GitHub Pages → branch `gh-pages` → root `/`.
@@ -74,7 +74,7 @@ Visit: `https://yourusername.github.io/repo-name/`
 
 Full PHP session auth available.
 
-1. Upload the entire `spa-builder/` folder to `public_html/`
+1. Upload the entire `dbeaver/` folder to `public_html/`
 2. The `.htaccess` file handles routing and security headers
 3. Ensure PHP 7.4+ is available (most shared hosts have it)
 4. Change passwords: edit `api/users.json` — replace `password_hash` values:
@@ -89,7 +89,7 @@ echo password_hash('yournewpassword', PASSWORD_BCRYPT);
 
 ### Option C — Netlify / Vercel (static)
 
-Same as GitHub Pages. Drag-and-drop the `spa-builder/` folder.
+Same as GitHub Pages. Drag-and-drop the `dbeaver/` folder.
 
 ### Option D — GitHub Actions deploy wizard (recommended)
 
@@ -101,7 +101,7 @@ inputs to deploy to:
 - `cloudflare-pages`
 
 The workflow runs prerequisite checks via
-`projects/spa-builder/scripts/preflight.sh`, uploads a reusable artifact, and
+`projects/dbeaver/scripts/preflight.sh`, uploads a reusable artifact, and
 then runs target-specific deployment jobs.
 
 #### Required GitHub Secrets

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SITE_DIR="$ROOT_DIR/spa-builder"
+SITE_DIR="$ROOT_DIR/dbeaver"
 STATE_FILE="${RUNNER_TEMP:-/tmp}/deploy-state-cpanel"
 
 : "${CPANEL_HOST:?CPANEL_HOST is required}"

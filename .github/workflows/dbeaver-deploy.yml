@@ -45,13 +45,13 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_PAGES_PROJECT: ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
-        run: bash projects/spa-builder/scripts/preflight.sh "${{ github.event.inputs.target }}"
+        run: bash projects/dbeaver/scripts/preflight.sh "${{ github.event.inputs.target }}"
 
       - name: Upload deploy artifact
         uses: actions/upload-artifact@v4
         with:
           name: dbeaver-site
-          path: projects/spa-builder/
+          path: projects/dbeaver/
           if-no-files-found: error
 
   deploy-github-pages:
@@ -96,7 +96,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dbeaver-site
-          path: projects/spa-builder/
+          path: projects/dbeaver/
 
       - name: Install rsync client
         run: sudo apt-get update && sudo apt-get install -y rsync openssh-client
@@ -107,7 +107,7 @@ jobs:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
           CPANEL_REMOTE_DIR: ${{ secrets.CPANEL_REMOTE_DIR }}
-        run: bash projects/spa-builder/scripts/deploy-cpanel.sh
+        run: bash projects/dbeaver/scripts/deploy-cpanel.sh
 
   deploy-cloudflare-pages:
     if: needs.preflight.outputs.target == 'cloudflare-pages'

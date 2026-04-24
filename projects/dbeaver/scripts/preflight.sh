@@ -3,7 +3,7 @@ set -euo pipefail
 
 TARGET="${1:-}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SITE_DIR="$ROOT_DIR/spa-builder"
+SITE_DIR="$ROOT_DIR/dbeaver"
 
 if [[ -z "$TARGET" ]]; then
   echo "Usage: $0 <target>"
