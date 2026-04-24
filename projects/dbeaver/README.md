@@ -1,8 +1,8 @@
 # dBeaver (working name) — DigitalHands Site Platform
 
 Generic AI-assisted website builder platform for multiple client verticals.
-Current demo template is spa & massage (Jacqueline-inspired), but the platform
-is not limited to spa businesses.
+Current demos are sample client builds; the platform is vertical-agnostic and
+intended for broad web/software service delivery.
 
 ## Live Demo
 
@@ -13,8 +13,8 @@ Open `index.html` for the full navigation hub.
 | Portal | Email | Password |
 |--------|-------|----------|
 | Admin  | `admin@digitalhands.in` | `admin123` |
-| Client (Serenity Spa) | `client@serenityspa.ca` | `spa2024` |
-| Client (Bloom Salon)  | `client@bloombeauty.ca` | `bloom2024` |
+| Client (Demo A) | `client@serenityspa.ca` | `spa2024` |
+| Client (Demo B) | `client@bloombeauty.ca` | `bloom2024` |
 
 ---
 
@@ -24,14 +24,14 @@ Open `index.html` for the full navigation hub.
 dbeaver/
 ├── index.html              ← Platform hub / entry point
 ├── .htaccess               ← Apache config (shared hosting)
-├── demo/                   ← Spa template (massagedowntownvancouver.com style)
+├── demo/                   ← Sample client template set
 │   ├── index.html          ← Home page
 │   ├── services.html       ← Services & pricing
 │   ├── booking.html        ← Appointment booking form
 │   ├── about.html          ← About & team
 │   ├── contact.html        ← Contact page
 │   └── assets/
-│       ├── css/main.css    ← Full spa stylesheet
+│       ├── css/main.css    ← Demo stylesheet
 │       └── js/main.js      ← Interactions, counters, forms
 ├── admin/                  ← DigitalHands.in admin panel
 │   ├── login.html          ← Admin login
