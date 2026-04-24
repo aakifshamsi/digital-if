@@ -8,6 +8,13 @@ intended for broad web/software service delivery.
 
 Open `index.html` for the full navigation hub.
 
+## Docs index
+
+- `CHANGELOG.md` → change history
+- `RELEASE_NOTES.md` → release summary + known risks
+- `USAGE.md` → quick start + common workflows
+- `OPERATIONS.md` → deployment, monitoring, rollback
+
 ### Demo Credentials
 
 | Portal | Email | Password |
