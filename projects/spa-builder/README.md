@@ -91,6 +91,31 @@ echo password_hash('yournewpassword', PASSWORD_BCRYPT);
 
 Same as GitHub Pages. Drag-and-drop the `spa-builder/` folder.
 
+### Option D — GitHub Actions deploy wizard (recommended)
+
+Use `.github/workflows/dbeaver-deploy.yml` with manual `workflow_dispatch`
+inputs to deploy to:
+- `dry-run` (preflight only)
+- `github-pages`
+- `cpanel-sftp`
+- `cloudflare-pages`
+
+The workflow runs prerequisite checks via
+`projects/spa-builder/scripts/preflight.sh`, uploads a reusable artifact, and
+then runs target-specific deployment jobs.
+
+#### Required GitHub Secrets
+
+- For `cpanel-sftp`:
+  - `CPANEL_HOST`
+  - `CPANEL_USER`
+  - `CPANEL_SSH_KEY` (private key content)
+  - `CPANEL_REMOTE_DIR` (for example: `/home/user/public_html`)
+- For `cloudflare-pages`:
+  - `CLOUDFLARE_API_TOKEN`
+  - `CLOUDFLARE_ACCOUNT_ID`
+  - `CLOUDFLARE_PAGES_PROJECT`
+
 ---
 
 ## Customization
