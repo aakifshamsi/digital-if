@@ -1,0 +1,225 @@
+name: PR Checks & Preview
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, closed]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# ── Job: sanity ──────────────────────────────────────────────────────────────
+# HTML validation, JS syntax, internal link check, file size guard.
+jobs:
+  sanity:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install htmlhint
+        run: npm install -g htmlhint
+
+      - name: Validate HTML
+        run: |
+          echo "──── HTML validation ────"
+          ERRORS=0
+          while IFS= read -r f; do
+            OUT=$(htmlhint "$f" 2>&1) || true
+            if echo "$OUT" | grep -qE 'error|Error'; then
+              echo "FAIL: $f"
+              echo "$OUT"
+              ERRORS=$((ERRORS+1))
+            fi
+          done < <(find projects/dbeaver -name "*.html")
+          [ $ERRORS -eq 0 ] && echo "All HTML files passed." || exit 1
+
+      - name: JavaScript syntax check
+        run: |
+          echo "──── JS syntax ────"
+          ERRORS=0
+          while IFS= read -r f; do
+            node --check "$f" 2>&1 || { echo "FAIL: $f"; ERRORS=$((ERRORS+1)); }
+          done < <(find projects/dbeaver -name "*.js" ! -path "*/node_modules/*")
+          [ $ERRORS -eq 0 ] && echo "All JS files passed." || exit 1
+
+      - name: Internal link check
+        run: |
+          echo "──── Internal links ────"
+          MISSING=0
+          ROOT="projects/dbeaver"
+          while IFS= read -r html; do
+            DIR=$(dirname "$html")
+            # Extract relative href/src values (skip anchors, external, and template literals)
+            grep -oE '(href|src)="[^"#http][^"]*"' "$html" \
+              | sed 's/.*="\(.*\)"/\1/' \
+              | grep -v '^\(http\|//\|mailto:\|tel:\|#\|javascript:\)' \
+              | while IFS= read -r link; do
+                  # Strip query strings and hashes
+                  CLEAN=$(echo "$link" | cut -d'?' -f1 | cut -d'#' -f1)
+                  [ -z "$CLEAN" ] && continue
+                  TARGET="$DIR/$CLEAN"
+                  [ -e "$TARGET" ] || { echo "BROKEN: $html → $link"; MISSING=$((MISSING+1)); }
+                done
+          done < <(find projects/dbeaver -name "*.html")
+          [ $MISSING -eq 0 ] && echo "All internal links OK." \
+            || echo "::warning::$MISSING broken internal link(s) found."
+
+      - name: File size guard
+        run: |
+          echo "──── File sizes ────"
+          WARN_KB=200
+          FAIL_KB=1000
+          STATUS=0
+          while IFS= read -r f; do
+            SIZE_KB=$(du -k "$f" | cut -f1)
+            if [ "$SIZE_KB" -ge "$FAIL_KB" ]; then
+              echo "::error::Oversized file (${SIZE_KB}KB): $f"
+              STATUS=1
+            elif [ "$SIZE_KB" -ge "$WARN_KB" ]; then
+              echo "::warning::Large file (${SIZE_KB}KB): $f"
+            fi
+          done < <(find projects/dbeaver -type f ! -path "*/.git/*")
+          exit $STATUS
+
+      - name: Security sanity
+        run: |
+          echo "──── Security sanity ────"
+          # Warn on hardcoded secrets patterns in changed files
+          git fetch origin main --depth=1
+          CHANGED=$(git diff --name-only origin/main...HEAD -- 'projects/dbeaver/**' || true)
+          [ -z "$CHANGED" ] && echo "No dbeaver files changed." && exit 0
+          ISSUES=0
+          echo "$CHANGED" | while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            grep -nHiE '(password|secret|api_key|token)\s*=\s*["\x27][^"\x27]{6,}' "$f" \
+              | grep -v -E '(placeholder|example|demo|your|replace|hash)' \
+              && ISSUES=$((ISSUES+1)) || true
+          done
+          echo "Security scan complete (warnings above are advisory)."
+
+# ── Job: preflight ───────────────────────────────────────────────────────────
+  preflight:
+    if: github.event.action != 'closed'
+    needs: sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preflight dry-run
+        run: bash projects/dbeaver/scripts/preflight.sh dry-run
+
+# ── Job: preview ─────────────────────────────────────────────────────────────
+# Deploys a Cloudflare Pages branch preview and comments the URL on the PR.
+# Skipped gracefully when CF secrets are not configured.
+  preview:
+    if: github.event.action != 'closed'
+    needs: [sanity, preflight]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    outputs:
+      preview_url: ${{ steps.deploy.outputs.preview_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Cloudflare secrets
+        id: cf_check
+        run: |
+          if [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] \
+          && [ -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ] \
+          && [ -n "${{ secrets.CLOUDFLARE_PAGES_PROJECT }}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Cloudflare secrets not configured — skipping preview deploy."
+          fi
+
+      - name: Deploy Cloudflare Pages preview
+        id: deploy
+        if: steps.cf_check.outputs.available == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          BRANCH="pr-${{ github.event.pull_request.number }}"
+          OUTPUT=$(npx wrangler@4 pages deploy projects/dbeaver \
+            --project-name "${{ secrets.CLOUDFLARE_PAGES_PROJECT }}" \
+            --branch "$BRANCH" 2>&1)
+          echo "$OUTPUT"
+          URL=$(echo "$OUTPUT" | grep -oE 'https://[a-z0-9-]+\.pages\.dev[^ ]*' | tail -1)
+          echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL on PR
+        if: steps.cf_check.outputs.available == 'true' && steps.deploy.outputs.preview_url != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ github.event.pull_request.number }}"
+          URL="${{ steps.deploy.outputs.preview_url }}"
+          SHA="${{ github.event.pull_request.head.sha }}"
+          SHORT="${SHA:0:7}"
+
+          # Delete previous preview comment if it exists
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
+            --jq '.[] | select(.body | startswith("<!-- dbeaver-preview -->")) | .id' | head -1)
+          [ -n "$COMMENT_ID" ] && gh api -X DELETE \
+            "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" || true
+
+          gh pr comment "$PR" --body "$(cat <<EOF
+          <!-- dbeaver-preview -->
+          ## 🚀 Preview Deployment
+
+          | | |
+          |---|---|
+          | **URL** | $URL |
+          | **Commit** | \`$SHORT\` |
+          | **Status** | ✅ Live |
+
+          > Updated on every push to this PR.
+          EOF
+          )"
+
+      - name: No-CF notice on PR
+        if: steps.cf_check.outputs.available == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ github.event.pull_request.number }}"
+          # Only post once
+          EXISTS=$(gh api "repos/${{ github.repository }}/issues/${PR}/comments" \
+            --jq '[.[] | select(.body | contains("preview requires"))] | length')
+          if [ "$EXISTS" = "0" ]; then
+            gh pr comment "$PR" --body "$(cat <<'EOF'
+          <!-- dbeaver-preview -->
+          > **Preview skipped** — add `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `CLOUDFLARE_PAGES_PROJECT` secrets to enable per-PR preview deployments.
+          EOF
+            )"
+          fi
+
+# ── Job: cleanup ─────────────────────────────────────────────────────────────
+# Deletes the Cloudflare Pages branch preview when the PR is closed/merged.
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Cloudflare Pages preview branch
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          BRANCH="pr-${{ github.event.pull_request.number }}"
+          PROJECT="${{ secrets.CLOUDFLARE_PAGES_PROJECT }}"
+          # List deployments for the branch and delete them
+          curl -s -X DELETE \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}/deployments?branch=${BRANCH}" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" || true
+          echo "Preview cleanup done for branch: $BRANCH"
