@@ -1,0 +1,48 @@
+{
+  "admins": [
+    {
+      "id": "adm_001",
+      "email": "admin@digitalhands.in",
+      "password_hash": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+      "name": "Admin",
+      "role": "Super Admin"
+    },
+    {
+      "id": "adm_002",
+      "email": "aakif@digitalhands.in",
+      "password_hash": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+      "name": "Aakif",
+      "role": "Owner"
+    }
+  ],
+  "clients": [
+    {
+      "id": "cli_001",
+      "name": "Serenity Spa & Massage",
+      "contact": "Maya Chen",
+      "email": "maya@serenityspa.ca",
+      "phone": "(604) 200-1234",
+      "domain": "massagedowntownvancouver.com",
+      "template": "spa-massage",
+      "status": "active",
+      "plan": "Professional",
+      "created": "2024-01-15",
+      "login_email": "client@serenityspa.ca",
+      "password_hash": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi"
+    },
+    {
+      "id": "cli_002",
+      "name": "Bloom Beauty Salon",
+      "contact": "Sophie Laurent",
+      "email": "sophie@bloombeauty.ca",
+      "phone": "(604) 333-5678",
+      "domain": "bloombeautyvancouver.com",
+      "template": "spa-massage",
+      "status": "active",
+      "plan": "Starter",
+      "created": "2024-02-20",
+      "login_email": "client@bloombeauty.ca",
+      "password_hash": "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi"
+    }
+  ]
+}

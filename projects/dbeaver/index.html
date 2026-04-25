@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dBeaver (Working Name) — DigitalHands Site Platform</title>
+  <meta name="description" content="DigitalHands multi-client site platform. Launch free starter sites, connect existing websites, and scale to custom domains and paid plans.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🤝</text></svg>">
+  <style>
+    :root {
+      --navy: #0f1628; --blue: #4a6cf7; --cyan: #22d3ee;
+      --gold: #c9a96e; --green: #1a3a2a;
+      --white: #fff; --text: #e2e8f0; --dim: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--navy); color: var(--text); min-height: 100vh;
+    }
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #070d1f 0%, #0f1628 55%, #0d2014 100%);
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 24px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(74,108,247,.15), transparent);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 860px; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(74,108,247,.15); border: 1px solid rgba(74,108,247,.3);
+      color: #818cf8; font-size: .78rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 20px; margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.4rem); font-weight: 700;
+      color: var(--white); line-height: 1.15; margin-bottom: 1.2rem;
+    }
+    h1 span {
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sub {
+      font-size: 1.1rem; color: var(--dim); max-width: 600px;
+      margin: 0 auto 2.8rem; line-height: 1.75;
+    }
+    .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      padding: 14px 32px; border-radius: 8px; font-size: .93rem;
+      font-weight: 600; cursor: pointer; transition: all .2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), #6b47ff);
+      color: var(--white); border: none;
+      box-shadow: 0 4px 24px rgba(74,108,247,.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(74,108,247,.5); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid rgba(255,255,255,.2);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.4); }
+    .btn-spa {
+      background: linear-gradient(135deg, var(--green), #2d5a3d);
+      color: var(--white); border: none;
+      box-shadow: 0 4px 20px rgba(26,58,42,.5);
+    }
+    .btn-spa:hover { transform: translateY(-2px); }
+    .btn-gold {
+      background: var(--gold); color: var(--green); border: none; font-weight: 700;
+    }
+    .btn-gold:hover { transform: translateY(-2px); background: #e2c48f; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px; max-width: 1000px; margin: 64px auto 0;
+    }
+    .card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 28px; text-align: left;
+      transition: all .2s;
+    }
+    .card:hover { background: rgba(255,255,255,.07); transform: translateY(-4px); }
+    .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+    .card-desc { font-size: .85rem; color: var(--dim); line-height: 1.65; }
+    .divider { text-align:center; color: var(--dim); font-size: .8rem; margin: 2.4rem 0; letter-spacing: .1em; text-transform: uppercase; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 2rem; }
+    .links a {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      color: var(--dim); padding: 8px 18px; border-radius: 6px; font-size: .83rem;
+      transition: all .2s; text-decoration: none;
+    }
+    .links a:hover { background: rgba(255,255,255,.1); color: var(--text); }
+    footer {
+      text-align: center; padding: 32px 24px;
+      font-size: .78rem; color: rgba(255,255,255,.25);
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    footer a { color: var(--gold); }
+    @media (max-width: 600px) { .cta-row { flex-direction: column; align-items: center; } }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🤝 dBeaver (Working Name) · DigitalHands Platform v1.0</div>
+    <h1>The <span>Multi-Client</span> Website Platform</h1>
+    <p class="sub">
+      Build, manage, and deploy websites for multiple business types with a
+      white-label admin. Demo clients are placeholders; this platform is built
+      to grow into a full IT services product.
+    </p>
+    <div class="cta-row">
+      <a href="admin/login.html" class="btn btn-primary">🔐 Admin Login</a>
+      <a href="client/login.html" class="btn btn-gold">🌿 Client Login</a>
+      <a href="demo/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-spa">🌐 View Demo Site</a>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Template Library (Modular)</div>
+        <div class="card-desc">Reusable templates for multiple industries, with per-client customization and migration workflows.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">AI Content Engine</div>
+        <div class="card-desc">Generate headlines, service descriptions, SEO meta tags, and social posts in one click.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <div class="card-title">Client & Domain Management</div>
+        <div class="card-desc">Manage clients, plans, and domains (platform subdomains, short domains, or client-owned domains for paid plans).</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✏️</div>
+        <div class="card-title">Visual Site Editor</div>
+        <div class="card-desc">Live preview editor with color theme switcher, page navigator, and device preview.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔑</div>
+        <div class="card-title">Client Portal</div>
+        <div class="card-desc">Clients get their own branded dashboard to view their site, stats, and contact support.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <div class="card-title">Deploy & Connect</div>
+        <div class="card-desc">Deploy on free-first stack and later connect existing client websites (e.g., GitHub/WordPress migration workflow).</div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin-top: 60px">— Demo Credentials —</div>
+    <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center; font-size:.85rem;">
+      <div style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:16px 24px; text-align:left;">
+        <div style="color:var(--cyan); font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px;">Admin Login</div>
+        <div>Email: <code style="color:#818cf8">admin@digitalhands.in</code></div>
+        <div>Password: <code style="color:#818cf8">admin123</code></div>
+      </div>
+      <div style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:16px 24px; text-align:left;">
+        <div style="color:var(--gold); font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px;">Client Login (Demo A)</div>
+        <div>Email: <code style="color:#fbbf24">client@serenityspa.ca</code></div>
+        <div>Password: <code style="color:#fbbf24">spa2024</code></div>
+      </div>
+    </div>
+
+    <div class="links" style="margin-top:2.8rem">
+      <a href="demo/index.html">🌿 Demo: Home</a>
+      <a href="demo/services.html">💆 Services</a>
+      <a href="demo/booking.html">📅 Booking</a>
+      <a href="demo/about.html">ℹ️ About</a>
+      <a href="demo/contact.html">📞 Contact</a>
+      <a href="admin/login.html">🔐 Admin Panel</a>
+      <a href="admin/dashboard.html">📊 Dashboard</a>
+      <a href="admin/clients.html">👥 Clients</a>
+      <a href="admin/editor.html">✏️ Editor</a>
+      <a href="admin/templates.html">🎨 Templates</a>
+      <a href="client/login.html">🌿 Client Portal</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built with ❤️ by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a> —
+  Multi-client website platform · demo clients shown are placeholders
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | Serenity Spa & Massage Vancouver</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌿</text></svg>">
+</head>
+<body>
+<header class="site-header scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Serenity</span>
+      <span class="nav-logo-tag">Spa &amp; Massage &nbsp;·&nbsp; Vancouver</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta"><a href="booking.html" class="btn btn-primary">Book Now</a></div>
+    <div class="nav-burger"><span></span><span></span><span></span></div>
+  </div>
+</header>
+<nav class="nav-mobile">
+  <a href="index.html">Home</a><a href="services.html">Services</a>
+  <a href="about.html">About</a><a href="contact.html">Contact</a>
+  <a href="booking.html" class="btn btn-primary">Book Now</a>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-label">Get in Touch</span>
+    <h1>Contact Us</h1>
+    <p class="page-hero-sub">We'd love to hear from you. Call, email, or send a message below.</p>
+  </div>
+</section>
+
+<section class="section" style="background:var(--cream)">
+  <div class="container">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:60px;">
+      <div class="fade-up">
+        <h3 class="text-green" style="margin-bottom:1.6rem">Send a Message</h3>
+        <form id="contact-form">
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Your Name</label>
+            <input type="text" placeholder="Jane Smith" required>
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Email Address</label>
+            <input type="email" placeholder="jane@example.com" required>
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Subject</label>
+            <select>
+              <option>General Enquiry</option>
+              <option>Booking Question</option>
+              <option>Gift Cards</option>
+              <option>Group / Corporate Bookings</option>
+              <option>Feedback</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:28px">
+            <label>Message</label>
+            <textarea rows="5" placeholder="How can we help?" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Send Message</button>
+        </form>
+      </div>
+      <div class="fade-up fade-up-d2">
+        <h3 class="text-green" style="margin-bottom:1.6rem">Reach Us Directly</h3>
+        <div class="location-detail" style="margin-bottom:1.4rem">
+          <span class="location-detail-icon">📍</span>
+          <div class="location-detail-text">
+            <strong>Address</strong>789 Granville Street, Suite 200<br>Vancouver, BC V6Z 1K3
+          </div>
+        </div>
+        <div class="location-detail" style="margin-bottom:1.4rem">
+          <span class="location-detail-icon">📞</span>
+          <div class="location-detail-text">
+            <strong>Phone</strong><a href="tel:+16042001234">(604) 200-1234</a>
+          </div>
+        </div>
+        <div class="location-detail" style="margin-bottom:1.4rem">
+          <span class="location-detail-icon">✉️</span>
+          <div class="location-detail-text">
+            <strong>Email</strong><a href="mailto:hello@serenityspa.ca">hello@serenityspa.ca</a>
+          </div>
+        </div>
+        <div class="location-detail" style="margin-bottom:1.4rem">
+          <span class="location-detail-icon">🕐</span>
+          <div class="location-detail-text">
+            <strong>Hours</strong>Mon–Fri: 9am – 8pm<br>Sat–Sun: 10am – 6pm
+          </div>
+        </div>
+        <div class="map-placeholder" style="height:240px; margin-top:28px; border-radius:12px">
+          <span style="font-size:2.5rem">📍</span>
+          <span style="font-size:.9rem">789 Granville St, Vancouver</span>
+          <a href="https://maps.google.com/?q=789+Granville+Street+Vancouver+BC" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size:.72rem; padding:10px 22px; margin-top:8px">
+            Open in Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none; padding-top:40px">
+      <span style="color:rgba(255,255,255,.4)">© 2024 Serenity Spa &amp; Massage</span>
+      <span class="footer-powered">Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  document.getElementById('contact-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const btn = this.querySelector('[type=submit]');
+    btn.textContent = 'Sending…'; btn.disabled = true;
+    setTimeout(() => {
+      alert('Thank you! We\'ll reply within 24 hours.');
+      this.reset(); btn.textContent = 'Send Message'; btn.disabled = false;
+    }, 1000);
+  });
+</script>
+</body>
+</html>

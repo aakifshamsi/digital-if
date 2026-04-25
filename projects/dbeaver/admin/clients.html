@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients — DigitalHands.in Admin</title>
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🤝</text></svg>">
+  <style>
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--navy-mid); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; }
+    .modal h3 { margin-bottom:1.4rem; }
+    .modal-field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+    .modal-field label { font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+    .modal-field input, .modal-field select { background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px; color:var(--text); font-size:.88rem; outline:none; }
+    .modal-field input:focus, .modal-field select:focus { border-color:var(--blue); }
+    .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+    .client-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px; transition:all var(--transition); }
+    .client-card:hover { border-color:rgba(74,108,247,.3); background:var(--card-hover); }
+    .clients-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">🤝</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">DigitalHands.in</div>
+        <div class="sidebar-brand-tag">Website Builder</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <a href="dashboard.html" class="sidebar-link"><span class="sidebar-link-icon">📊</span> Dashboard</a>
+      <a href="clients.html"   class="sidebar-link"><span class="sidebar-link-icon">👥</span> Clients</a>
+      <a href="editor.html"    class="sidebar-link"><span class="sidebar-link-icon">✏️</span> Site Editor</a>
+      <a href="templates.html" class="sidebar-link"><span class="sidebar-link-icon">🎨</span> Templates</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Shortcuts</div>
+      <a href="../demo/index.html" target="_blank" rel="noopener noreferrer" class="sidebar-link"><span class="sidebar-link-icon">🌐</span> View Demo Site</a>
+      <a href="../client/login.html" target="_blank" rel="noopener noreferrer" class="sidebar-link"><span class="sidebar-link-icon">🔑</span> Client Portal</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="doLogout()">
+        <div class="sidebar-avatar" id="sidebar-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Admin</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Loading…</div>
+        </div>
+        <span style="color:var(--text-dim); margin-left:auto; font-size:.8rem;">⏏</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">Clients</div>
+      <div class="topbar-actions">
+        <button class="topbar-btn topbar-btn-primary" onclick="openAddModal()">+ Add Client</button>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="clients-grid" id="clients-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Client Modal -->
+<div class="modal-overlay" id="client-modal">
+  <div class="modal">
+    <h3 id="modal-title">Add New Client</h3>
+    <input type="hidden" id="modal-id">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+      <div class="modal-field" style="grid-column:span 2">
+        <label>Business Name</label>
+        <input id="m-name" placeholder="Serenity Spa & Massage">
+      </div>
+      <div class="modal-field">
+        <label>Contact Name</label>
+        <input id="m-contact" placeholder="Maya Chen">
+      </div>
+      <div class="modal-field">
+        <label>Phone</label>
+        <input id="m-phone" placeholder="(604) 200-1234">
+      </div>
+      <div class="modal-field">
+        <label>Contact Email</label>
+        <input id="m-email" placeholder="maya@example.com">
+      </div>
+      <div class="modal-field">
+        <label>Domain / URL</label>
+        <input id="m-domain" placeholder="example.com">
+      </div>
+      <div class="modal-field">
+        <label>Plan</label>
+        <select id="m-plan">
+          <option>Starter</option>
+          <option>Professional</option>
+          <option>Enterprise</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Status</label>
+        <select id="m-status">
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-field" style="grid-column:span 2">
+        <label>Client Login Email</label>
+        <input id="m-login-email" placeholder="client@example.com">
+      </div>
+      <div class="modal-field" style="grid-column:span 2">
+        <label>Client Login Password</label>
+        <input id="m-login-pass" placeholder="••••••••" type="text">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="topbar-btn" onclick="closeModal()">Cancel</button>
+      <button class="topbar-btn topbar-btn-primary" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/admin.js"></script>
+<script>
+function renderClients() {
+  const clients = window.getClients();
+  const grid = document.getElementById('clients-grid');
+  grid.innerHTML = '';
+  clients.forEach(function(c) {
+    const div = document.createElement('div');
+    div.className = 'client-card';
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px">
+        <div>
+          <div style="font-weight:700; font-size:1rem; color:var(--text); margin-bottom:2px">${c.name}</div>
+          <div style="font-size:.78rem; color:var(--text-dim)">${c.domain}</div>
+        </div>
+        <span class="badge badge-${c.status==='active'?'green':c.status==='pending'?'yellow':'gray'}">${c.status}</span>
+      </div>
+      <div style="font-size:.83rem; color:var(--text-mid); margin-bottom:4px">👤 ${c.contact}</div>
+      <div style="font-size:.83rem; color:var(--text-mid); margin-bottom:4px">✉️ ${c.email}</div>
+      <div style="font-size:.83rem; color:var(--text-mid); margin-bottom:12px">📞 ${c.phone}</div>
+      <div style="background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin-bottom:14px; font-size:.78rem; color:var(--text-dim);">
+        <strong style="color:var(--text-mid)">Client Login Credentials</strong><br>
+        Email: <span style="color:var(--cyan)">${c.login.email}</span><br>
+        Password: <span style="color:var(--cyan)">${c.login.password}</span>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <span class="badge badge-blue">${c.plan}</span>
+        <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="editClient('${c.id}')">Edit</button>
+        <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="window.open('../editor.html?client=${c.id}','_blank')">Open Editor</button>
+        <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="deleteClient('${c.id}')">Delete</button>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'Add New Client';
+  document.getElementById('modal-id').value = '';
+  ['m-name','m-contact','m-email','m-phone','m-domain','m-login-email','m-login-pass'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('m-plan').value   = 'Starter';
+  document.getElementById('m-status').value = 'active';
+  document.getElementById('client-modal').classList.add('open');
+}
+
+function editClient(id) {
+  const c = window.getClients().find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('modal-title').textContent = 'Edit Client';
+  document.getElementById('modal-id').value          = c.id;
+  document.getElementById('m-name').value            = c.name;
+  document.getElementById('m-contact').value         = c.contact;
+  document.getElementById('m-email').value           = c.email;
+  document.getElementById('m-phone').value           = c.phone;
+  document.getElementById('m-domain').value          = c.domain;
+  document.getElementById('m-plan').value            = c.plan;
+  document.getElementById('m-status').value          = c.status;
+  document.getElementById('m-login-email').value     = c.login.email;
+  document.getElementById('m-login-pass').value      = c.login.password;
+  document.getElementById('client-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('client-modal').classList.remove('open');
+}
+
+function saveClient() {
+  const id    = document.getElementById('modal-id').value;
+  const data  = {
+    name: document.getElementById('m-name').value,
+    contact: document.getElementById('m-contact').value,
+    email: document.getElementById('m-email').value,
+    phone: document.getElementById('m-phone').value,
+    domain: document.getElementById('m-domain').value,
+    plan: document.getElementById('m-plan').value,
+    status: document.getElementById('m-status').value,
+    template: 'spa-massage',
+    login: {
+      email: document.getElementById('m-login-email').value,
+      password: document.getElementById('m-login-pass').value
+    }
+  };
+  if (!data.name) { showToast('Business name is required','error'); return; }
+  let clients = window.getClients();
+  if (id) {
+    const idx = clients.findIndex(c => c.id === id);
+    if (idx > -1) clients[idx] = Object.assign(clients[idx], data);
+  } else {
+    data.id = 'cli_' + Date.now();
+    data.created = new Date().toISOString().split('T')[0];
+    clients.push(data);
+  }
+  window.saveClients(clients);
+  closeModal();
+  renderClients();
+  showToast(id ? 'Client updated!' : 'Client added!', 'success');
+}
+
+function deleteClient(id) {
+  if (!confirm('Delete this client? This cannot be undone.')) return;
+  let clients = window.getClients().filter(c => c.id !== id);
+  window.saveClients(clients);
+  renderClients();
+  showToast('Client deleted.', 'info');
+}
+
+document.addEventListener('DOMContentLoaded', renderClients);
+</script>
+</body>
+</html>

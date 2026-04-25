@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book an Appointment | Serenity Spa & Massage Vancouver</title>
+  <meta name="description" content="Book your massage or spa treatment online at Serenity Spa in Downtown Vancouver.">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌿</text></svg>">
+</head>
+<body>
+
+<header class="site-header scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name">Serenity</span>
+      <span class="nav-logo-tag">Spa &amp; Massage &nbsp;·&nbsp; Vancouver</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta"><a href="booking.html" class="btn btn-primary">Book Now</a></div>
+    <div class="nav-burger"><span></span><span></span><span></span></div>
+  </div>
+</header>
+<nav class="nav-mobile">
+  <a href="index.html">Home</a><a href="services.html">Services</a>
+  <a href="about.html">About</a><a href="contact.html">Contact</a>
+  <a href="booking.html" class="btn btn-primary">Book Now</a>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-label">Reserve Your Session</span>
+    <h1>Book an Appointment</h1>
+    <p class="page-hero-sub">Same-day appointments often available. We'll confirm within 2 hours.</p>
+  </div>
+</section>
+
+<section class="section" style="background:var(--cream)">
+  <div class="container">
+    <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:60px; align-items:start;">
+
+      <div class="booking-form-wrap fade-up">
+        <h3 class="text-green" style="margin-bottom:1.6rem">Appointment Request</h3>
+        <form id="booking-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fname">First Name</label>
+              <input type="text" id="fname" placeholder="Jane" required>
+            </div>
+            <div class="form-group">
+              <label for="lname">Last Name</label>
+              <input type="text" id="lname" placeholder="Smith" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="jane@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="(604) 555-0123">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="service">Service</label>
+              <select id="service" required>
+                <option value="">Select a treatment…</option>
+                <optgroup label="Swedish Massage">
+                  <option>Swedish Massage — 60 min ($90)</option>
+                  <option>Swedish Massage — 90 min ($130)</option>
+                  <option>Swedish Massage — 120 min ($165)</option>
+                </optgroup>
+                <optgroup label="Deep Tissue">
+                  <option>Deep Tissue — 60 min ($110)</option>
+                  <option>Deep Tissue — 90 min ($155)</option>
+                </optgroup>
+                <optgroup label="Specialty">
+                  <option>Hot Stone Therapy — 75 min ($130)</option>
+                  <option>Prenatal Massage — 60 min ($100)</option>
+                  <option>Aromatherapy — 60 min ($115)</option>
+                  <option>Reflexology — 45 min ($80)</option>
+                  <option>Couples Massage — 60 min ($200)</option>
+                  <option>Sports Massage — 60 min ($120)</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="therapist">Therapist Preference</label>
+              <select id="therapist">
+                <option value="">No preference</option>
+                <option>Maya Chen — RMT</option>
+                <option>David Park — Deep Tissue</option>
+                <option>Aisha Thompson — Aromatherapy</option>
+                <option>Lena Müller — Prenatal</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">Preferred Date</label>
+              <input type="date" id="date" required>
+            </div>
+            <div class="form-group">
+              <label for="time">Preferred Time</label>
+              <select id="time">
+                <option>Morning (9am – 12pm)</option>
+                <option>Afternoon (12pm – 4pm)</option>
+                <option>Evening (4pm – 8pm)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:28px">
+            <label for="notes">Special Requests / Health Notes</label>
+            <textarea id="notes" placeholder="Let us know about any injuries, areas of focus, or special requests…"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; font-size:.88rem; padding:17px">
+            Request Appointment
+          </button>
+          <p style="font-family:'Helvetica Neue',sans-serif; font-size:.78rem; color:var(--text-light); text-align:center; margin-top:14px;">
+            We'll confirm your booking via email within 2 hours.
+          </p>
+        </form>
+      </div>
+
+      <div class="fade-up fade-up-d2" style="position:sticky; top:100px">
+        <div style="background:var(--green-deep); border-radius:var(--radius-lg); padding:36px 28px; color:var(--white); margin-bottom:24px;">
+          <span class="section-label" style="color:var(--gold-light)">Location</span>
+          <h3 style="color:var(--white); font-size:1.1rem; margin-bottom:1.2rem">789 Granville St, #200<br>Vancouver, BC</h3>
+          <div style="font-size:.9rem; color:rgba(255,255,255,.7); display:flex; flex-direction:column; gap:10px;">
+            <div>🕐 Mon–Fri 9am – 8pm</div>
+            <div>🕐 Sat–Sun 10am – 6pm</div>
+            <div>📞 <a href="tel:+16042001234" style="color:var(--gold)">(604) 200-1234</a></div>
+            <div>✉️ <a href="mailto:hello@serenityspa.ca" style="color:var(--gold)">hello@serenityspa.ca</a></div>
+          </div>
+        </div>
+        <div style="background:var(--white); border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow); border-top:3px solid var(--gold);">
+          <h4 style="color:var(--green-deep); margin-bottom:.8rem; font-size:.95rem;">Cancellation Policy</h4>
+          <p style="font-size:.85rem; color:var(--text-mid); margin:0; line-height:1.65;">
+            Please provide 24 hours notice for cancellations or rescheduling.
+            Late cancellations may be subject to a 50% service fee.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none; padding-top:40px">
+      <span style="color:rgba(255,255,255,.4)">© 2024 Serenity Spa &amp; Massage</span>
+      <span class="footer-powered">Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  // Set minimum date to today
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+  }
+</script>
+</body>
+</html>

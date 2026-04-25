@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — DigitalHands.in Admin</title>
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🤝</text></svg>">
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">🤝</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">DigitalHands.in</div>
+        <div class="sidebar-brand-tag">Website Builder</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <a href="dashboard.html" class="sidebar-link">
+        <span class="sidebar-link-icon">📊</span> Dashboard
+      </a>
+      <a href="clients.html" class="sidebar-link">
+        <span class="sidebar-link-icon">👥</span> Clients
+        <span class="sidebar-link-badge" id="client-count">3</span>
+      </a>
+      <a href="editor.html" class="sidebar-link">
+        <span class="sidebar-link-icon">✏️</span> Site Editor
+      </a>
+      <a href="templates.html" class="sidebar-link">
+        <span class="sidebar-link-icon">🎨</span> Templates
+        <span class="sidebar-link-badge">1</span>
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Tools</div>
+      <a href="#" class="sidebar-link" onclick="showToast('AI content generator — coming soon!','info'); return false;">
+        <span class="sidebar-link-icon">🤖</span> AI Content
+      </a>
+      <a href="#" class="sidebar-link" onclick="showToast('SEO tools — coming soon!','info'); return false;">
+        <span class="sidebar-link-icon">🔍</span> SEO Tools
+      </a>
+      <a href="#" class="sidebar-link" onclick="showToast('Analytics — coming soon!','info'); return false;">
+        <span class="sidebar-link-icon">📈</span> Analytics
+      </a>
+      <a href="#" class="sidebar-link" onclick="showToast('Billing — coming soon!','info'); return false;">
+        <span class="sidebar-link-icon">💳</span> Billing
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Shortcuts</div>
+      <a href="../demo/index.html" target="_blank" rel="noopener noreferrer" class="sidebar-link">
+        <span class="sidebar-link-icon">🌐</span> View Demo Site
+      </a>
+      <a href="../client/login.html" target="_blank" rel="noopener noreferrer" class="sidebar-link">
+        <span class="sidebar-link-icon">🔑</span> Client Portal
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="doLogout()">
+        <div class="sidebar-avatar" id="sidebar-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Admin</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Loading…</div>
+        </div>
+        <span style="color:var(--text-dim); margin-left:auto; font-size:.8rem;" title="Logout">⏏</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" onclick="window.location.href='clients.html'">+ New Client</button>
+        <button class="topbar-btn topbar-btn-primary" onclick="window.location.href='editor.html'">
+          Open Editor
+        </button>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="stat-clients">3</div>
+          <div class="stat-label">Active Clients</div>
+          <div class="stat-change up">↑ 1 this month</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-value">2</div>
+          <div class="stat-label">Live Sites</div>
+          <div class="stat-change up">↑ 100% uptime</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value">$580</div>
+          <div class="stat-label">Monthly Revenue</div>
+          <div class="stat-change up">↑ $80 from last month</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value">4.9</div>
+          <div class="stat-label">Avg. Rating</div>
+          <div class="stat-change up">Based on 47 reviews</div>
+        </div>
+      </div>
+
+      <!-- Recent clients + Activity -->
+      <div class="two-col" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Clients</span>
+            <a href="clients.html" style="font-size:.8rem; color:var(--text-mid);">View all →</a>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="clients-table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Status</th>
+                  <th>Plan</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Quick Actions</span>
+          </div>
+          <div class="card-body" style="display:flex; flex-direction:column; gap:10px;">
+            <button class="topbar-btn topbar-btn-primary" style="width:100%; text-align:center; padding:12px;"
+              onclick="window.location.href='editor.html'">
+              ✏️ &nbsp; Open Site Editor
+            </button>
+            <button class="topbar-btn" style="width:100%; text-align:center; padding:12px;"
+              onclick="window.location.href='clients.html'">
+              👥 &nbsp; Add New Client
+            </button>
+            <button class="topbar-btn" style="width:100%; text-align:center; padding:12px;"
+              onclick="window.open('../demo/index.html','_blank')">
+              🌐 &nbsp; Preview Demo Site
+            </button>
+            <button class="topbar-btn" style="width:100%; text-align:center; padding:12px;"
+              onclick="window.open('../client/login.html','_blank')">
+              🔑 &nbsp; Client Login Preview
+            </button>
+            <hr style="border:none; border-top:1px solid var(--border); margin:4px 0;">
+            <div style="font-size:.8rem; color:var(--text-dim); text-align:center;">
+              🤖 AI Content Generator<br>
+              <span style="font-size:.72rem; color:var(--blue-light);">Coming in v2.0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform overview -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🚀 Platform Overview — Spa &amp; Wellness Template v1.0</span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        <div class="card-body">
+          <div class="three-col" style="margin-bottom:20px">
+            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center;">
+              <div style="font-size:2rem; margin-bottom:.4rem">🎨</div>
+              <div style="font-weight:600; margin-bottom:.3rem">Jacqueline-Style Template</div>
+              <div style="font-size:.8rem; color:var(--text-dim);">5-page spa website with booking, services, about, contact</div>
+            </div>
+            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center;">
+              <div style="font-size:2rem; margin-bottom:.4rem">🤖</div>
+              <div style="font-weight:600; margin-bottom:.3rem">AI Content Ready</div>
+              <div style="font-size:.8rem; color:var(--text-dim);">Auto-generate copy, meta tags, and service descriptions</div>
+            </div>
+            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center;">
+              <div style="font-size:2rem; margin-bottom:.4rem">🌐</div>
+              <div style="font-weight:600; margin-bottom:.3rem">Deploy Anywhere</div>
+              <div style="font-size:.8rem; color:var(--text-dim);">GitHub Pages, Linux shared hosting, or Netlify</div>
+            </div>
+          </div>
+          <div style="background:rgba(74,108,247,.08); border:1px solid rgba(74,108,247,.2); border-radius:8px; padding:16px 20px; font-size:.85rem; color:var(--text-mid);">
+            💡 <strong style="color:var(--text)">Next steps:</strong>
+            Add client massagedowntownvancouver.com → Customize template → Deploy to GitHub Pages or cPanel hosting.
+            <a href="editor.html" style="color:var(--blue-light); margin-left:8px;">Open Editor →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const clients = window.getClients();
+  const tbody = document.getElementById('clients-tbody');
+  document.getElementById('stat-clients').textContent = clients.length;
+  document.getElementById('client-count').textContent = clients.length;
+
+  clients.forEach(function(c) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="cell-name">${c.name}</div>
+        <div style="font-size:.75rem; color:var(--text-dim)">${c.domain}</div>
+      </td>
+      <td><span class="badge badge-${c.status==='active'?'green':c.status==='pending'?'yellow':'gray'}">${c.status}</span></td>
+      <td><span style="font-size:.82rem">${c.plan}</span></td>
+      <td>
+        <a href="editor.html?client=${c.id}" style="font-size:.8rem; color:var(--blue-light); margin-right:8px;">Edit</a>
+        <a href="clients.html" style="font-size:.8rem; color:var(--text-dim)">View</a>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+});
+</script>
+</body>
+</html>

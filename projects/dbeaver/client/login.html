@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Login — DigitalHands.in</title>
+  <link rel="stylesheet" href="assets/css/client.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🌿</text></svg>">
+</head>
+<body>
+
+<div class="cp-login">
+  <div class="cp-login-card">
+    <div class="cp-brand">
+      <div class="cp-brand-logo">🌿</div>
+      <div class="cp-brand-name">Client Portal</div>
+      <div class="cp-brand-tag">Powered by DigitalHands.in</div>
+    </div>
+
+    <h2 class="cp-title">Welcome back</h2>
+    <p class="cp-sub">Log in to view your website, analytics, and manage your presence.</p>
+
+    <div class="cp-error" id="cp-error">Incorrect email or password.</div>
+
+    <form id="cp-form" novalidate>
+      <div class="cp-field">
+        <label>Email Address</label>
+        <input type="email" id="cp-email" placeholder="you@yourbusiness.com" autocomplete="username" required>
+      </div>
+      <div class="cp-field">
+        <label>Password</label>
+        <input type="password" id="cp-pass" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="cp-btn" id="cp-submit">Sign In</button>
+    </form>
+
+    <div class="cp-hint" style="margin-top:1.4rem">
+      <strong>Demo:</strong><br>
+      Email: <span>client@serenityspa.ca</span><br>
+      Password: <span>spa2024</span>
+    </div>
+
+    <div style="text-align:center; margin-top:1.4rem; border-top:1px solid #eee; padding-top:1.2rem;">
+      <a href="../admin/login.html" style="font-size:.78rem; color:#aaa;">Admin? Sign in here →</a>
+    </div>
+    <div style="text-align:center; margin-top:.6rem;">
+      <a href="../demo/index.html" style="font-size:.78rem; color:#bbb;">← View your website</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  if (sessionStorage.getItem('dh_client_auth') === 'true') {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  document.getElementById('cp-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('cp-email').value.trim().toLowerCase();
+    const pass  = document.getElementById('cp-pass').value;
+    const btn   = document.getElementById('cp-submit');
+    const err   = document.getElementById('cp-error');
+    btn.textContent = 'Signing in…'; btn.disabled = true;
+    err.classList.remove('show');
+
+    // Load clients from localStorage or use defaults
+    const raw = localStorage.getItem('dh_clients');
+    let clients = raw ? JSON.parse(raw) : [];
+    if (!clients.length) {
+      clients = [
+        { id:'cli_001', name:'Serenity Spa & Massage', domain:'massagedowntownvancouver.com',
+          login:{ email:'client@serenityspa.ca', password:'spa2024' } },
+        { id:'cli_002', name:'Bloom Beauty Salon', domain:'bloombeautyvancouver.com',
+          login:{ email:'client@bloombeauty.ca', password:'bloom2024' } }
+      ];
+    }
+
+    setTimeout(function() {
+      const client = clients.find(function(c) {
+        return c.login && c.login.email === email && c.login.password === pass;
+      });
+      if (client) {
+        sessionStorage.setItem('dh_client_auth', 'true');
+        sessionStorage.setItem('dh_client_data', JSON.stringify(client));
+        window.location.href = 'dashboard.html';
+      } else {
+        err.classList.add('show');
+        btn.textContent = 'Sign In'; btn.disabled = false;
+      }
+    }, 750);
+  });
+})();
+</script>
+</body>
+</html>

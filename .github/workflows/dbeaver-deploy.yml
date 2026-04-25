@@ -1,0 +1,142 @@
+name: dBeaver Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        required: true
+        type: choice
+        options:
+          - dry-run
+          - github-pages
+          - cpanel-sftp
+          - cloudflare-pages
+      ref:
+        description: "Git ref to deploy (branch/tag/SHA)"
+        required: false
+        default: ""
+
+concurrency:
+  group: dbeaver-deploy-${{ github.event.inputs.target || 'dry-run' }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      target: ${{ steps.capture.outputs.target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Capture target
+        id: capture
+        run: echo "target=${{ github.event.inputs.target }}" >> "$GITHUB_OUTPUT"
+
+      - name: Run preflight checks
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_REMOTE_DIR: ${{ secrets.CPANEL_REMOTE_DIR }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT: ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
+        run: bash projects/dbeaver/scripts/preflight.sh "${{ github.event.inputs.target }}"
+
+      - name: Upload deploy artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbeaver-site
+          path: projects/dbeaver/
+          if-no-files-found: error
+
+  deploy-github-pages:
+    if: needs.preflight.outputs.target == 'github-pages'
+    needs: preflight
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dbeaver-site
+          path: ./site
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  deploy-cpanel:
+    if: needs.preflight.outputs.target == 'cpanel-sftp'
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dbeaver-site
+          path: projects/dbeaver/
+
+      - name: Install rsync client
+        run: sudo apt-get update && sudo apt-get install -y rsync openssh-client
+
+      - name: Deploy to cPanel over SSH/SFTP
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_REMOTE_DIR: ${{ secrets.CPANEL_REMOTE_DIR }}
+        run: bash projects/dbeaver/scripts/deploy-cpanel.sh
+
+  deploy-cloudflare-pages:
+    if: needs.preflight.outputs.target == 'cloudflare-pages'
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dbeaver-site
+          path: ./site
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT: ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
+        run: |
+          npx wrangler@4 pages deploy ./site \
+            --project-name "$CLOUDFLARE_PAGES_PROJECT" \
+            --branch "main"
+
+  dry-run:
+    if: needs.preflight.outputs.target == 'dry-run'
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Dry-run successful. Preflight and packaging completed."
