@@ -7,6 +7,9 @@
 
   /* ── Auth guard ── */
   function requireAuth() {
+    // DEMO MODE: sessionStorage gate — trivially bypassable via DevTools.
+    // Production: replace with a fetch to api/auth.php?action=me and
+    // redirect on 401 response from the PHP session layer.
     if (sessionStorage.getItem('dh_admin_auth') !== 'true') {
       window.location.href = 'login.html';
       return false;

@@ -91,6 +91,7 @@ Full PHP session auth available.
 echo password_hash('yournewpassword', PASSWORD_BCRYPT);
 ```
 
+<!-- -->
 5. For PHP auth, update the login forms to POST to `../api/auth.php`
    instead of using the built-in sessionStorage demo auth.
 
