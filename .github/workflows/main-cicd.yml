@@ -1,0 +1,198 @@
+name: CI/CD — Build · Deploy · Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump override (leave blank for auto)"
+        required: false
+        type: choice
+        options: ["", "patch", "minor", "major"]
+        default: ""
+
+concurrency:
+  group: cicd-main
+  cancel-in-progress: false
+
+# ── Job: prepare ────────────────────────────────────────────────────────────
+# Auto-bump semver tag, update CHANGELOG.md, commit, push, save release notes.
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      new_tag: ${{ steps.bump.outputs.new_tag }}
+      prev_tag: ${{ steps.bump.outputs.prev_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine bump & new tag
+        id: bump
+        run: |
+          LATEST=$(git tag --list 'v*' --sort=-version:refname | head -1)
+          [ -z "$LATEST" ] && LATEST="v0.0.0"
+
+          MAJOR=$(echo "${LATEST#v}" | cut -d. -f1)
+          MINOR=$(echo "${LATEST#v}" | cut -d. -f2)
+          PATCH=$(echo "${LATEST#v}" | cut -d. -f3)
+
+          if [ "$LATEST" = "v0.0.0" ]; then
+            COMMITS=$(git log --oneline --no-merges)
+          else
+            COMMITS=$(git log "${LATEST}..HEAD" --oneline --no-merges)
+          fi
+
+          FORCE="${{ github.event.inputs.bump }}"
+          if [ -n "$FORCE" ]; then
+            BUMP=$FORCE
+          elif echo "$COMMITS" | grep -qiE '(BREAKING[[:space:]]CHANGE|^[a-f0-9]+[[:space:]][a-z]+!:)'; then
+            BUMP=major
+          elif echo "$COMMITS" | grep -qE '^[a-f0-9]+ feat(\([^)]+\))?:'; then
+            BUMP=minor
+          else
+            BUMP=patch
+          fi
+
+          case $BUMP in
+            major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH+1)) ;;
+          esac
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "new_tag=$NEW_TAG"   >> "$GITHUB_OUTPUT"
+          echo "prev_tag=$LATEST"   >> "$GITHUB_OUTPUT"
+          echo "bump=$BUMP"         >> "$GITHUB_OUTPUT"
+          echo "Bumping $LATEST → $NEW_TAG ($BUMP)"
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          LATEST="${{ steps.bump.outputs.prev_tag }}"
+          NEW_TAG="${{ steps.bump.outputs.new_tag }}"
+          DATE=$(date +%Y-%m-%d)
+
+          if [ "$LATEST" = "v0.0.0" ]; then
+            LOG=$(git log --no-merges --pretty="format:- %s (%h)")
+          else
+            LOG=$(git log "${LATEST}..HEAD" --no-merges --pretty="format:- %s (%h)")
+          fi
+
+          FEAT=$(echo "$LOG"  | grep -E '^- feat'                          || true)
+          FIX=$(echo "$LOG"   | grep -E '^- fix'                           || true)
+          DOCS=$(echo "$LOG"  | grep -E '^- docs'                          || true)
+          CI=$(echo "$LOG"    | grep -E '^- (ci|chore|build)'              || true)
+          OTHER=$(echo "$LOG" | grep -vE '^- (feat|fix|docs|ci|chore|build|refactor|style|test)' || true)
+
+          {
+            echo "## ${NEW_TAG} — ${DATE}"
+            echo ""
+            [ -n "$FEAT"  ] && printf "### Features\n%s\n\n"     "$FEAT"
+            [ -n "$FIX"   ] && printf "### Bug Fixes\n%s\n\n"    "$FIX"
+            [ -n "$DOCS"  ] && printf "### Documentation\n%s\n\n" "$DOCS"
+            [ -n "$CI"    ] && printf "### Maintenance\n%s\n\n"   "$CI"
+            [ -n "$OTHER" ] && printf "### Other\n%s\n\n"         "$OTHER"
+          } > /tmp/release-notes.md
+
+          cat /tmp/release-notes.md
+
+      - name: Update CHANGELOG.md
+        run: |
+          CHANGELOG="projects/dbeaver/CHANGELOG.md"
+          NEW_TAG="${{ steps.bump.outputs.new_tag }}"
+
+          if [ -f "$CHANGELOG" ]; then
+            # Insert new entry after the header block (first blank line after H1)
+            awk -v entry="$(cat /tmp/release-notes.md)" '
+              /^# / && !inserted { print; next }
+              /^$/ && !inserted  { print entry; print "---"; print ""; inserted=1 }
+              { print }
+            ' "$CHANGELOG" > /tmp/CHANGELOG.md && mv /tmp/CHANGELOG.md "$CHANGELOG"
+          else
+            {
+              echo "# Changelog"
+              echo ""
+              echo "All notable changes are documented here (auto-generated)."
+              echo ""
+              cat /tmp/release-notes.md
+            } > "$CHANGELOG"
+          fi
+
+          git add "$CHANGELOG"
+          git diff --cached --quiet || \
+            git commit -m "chore(release): update CHANGELOG for ${NEW_TAG} [skip ci]"
+          git push
+
+      - name: Create and push tag
+        run: |
+          NEW_TAG="${{ steps.bump.outputs.new_tag }}"
+          git tag -a "$NEW_TAG" -m "Release ${NEW_TAG}"
+          git push origin "$NEW_TAG"
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: /tmp/release-notes.md
+          retention-days: 7
+
+# ── Job: deploy-pages ───────────────────────────────────────────────────────
+  deploy-pages:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: projects/dbeaver/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+# ── Job: create-release ──────────────────────────────────────────────────────
+  create-release:
+    needs: [prepare, deploy-pages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: /tmp/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_TAG="${{ needs.prepare.outputs.new_tag }}"
+          gh release create "$NEW_TAG" \
+            --title "Release ${NEW_TAG}" \
+            --notes-file /tmp/release-notes.md \
+            --latest
