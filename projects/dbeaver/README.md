@@ -157,6 +157,7 @@ to a free/local provider such as:
 ## Roadmap
 
 ### v1.0 — Foundation ✅
+
 - [x] dBeaver demo: multi-client website builder platform
 - [x] Admin panel (login, dashboard, clients, editor, templates)
 - [x] Client portal (login, dashboard)
@@ -168,6 +169,7 @@ to a free/local provider such as:
 - [x] PR preview deployments (Cloudflare Pages branch previews)
 
 ### v1.1 — Digital Hands Platform (active)
+
 - [ ] dh-platform: corporate landing page live at digitalhands.in
 - [ ] Admin CRM — client list, add/edit, notes, status
 - [ ] Invoicing manager — create, send, track, PDF export
@@ -176,6 +178,7 @@ to a free/local provider such as:
 - [ ] Pricing page with freemium / pro / agency tiers
 
 ### v1.2 — Infrastructure Bridge
+
 - [ ] Centralized credential manager: CF Account ID + API Token → app derives all
   sub-credentials (Workers, R2, KV, Tunnel, DNS) — users provide two values, the rest is automatic
 - [ ] Domain manager: provision short aliases (`yourbiz.dh.in`) via CF DNS API
@@ -186,6 +189,7 @@ to a free/local provider such as:
 - [ ] Multi-cloud config sync: CF KV as the single source of truth across all environments
 
 ### v1.3 — AI & Automation
+
 - [ ] Real AI content generation (Cloudflare Workers AI — free tier)
 - [ ] AI-generated site sections, copy, images via marketplace artifacts
 - [ ] Email automation: appointment confirmations, invoice delivery
@@ -193,6 +197,7 @@ to a free/local provider such as:
 - [ ] Drag-and-drop block editor
 
 ### v2.0 — Scale & Monetisation
+
 - [ ] Hybrid business model: freemium + affiliate + white-label + service-based
 - [ ] Affiliate / reseller program with commission tracking dashboard
 - [ ] Stripe / Razorpay billing integration

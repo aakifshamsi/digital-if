@@ -43,6 +43,16 @@ jobs:
           LATEST=$(git tag --list 'v*' --sort=-version:refname | head -1)
           [ -z "$LATEST" ] && LATEST="v0.0.0"
 
+          # Idempotence: if HEAD is already tagged, reuse that tag and skip bump
+          EXISTING_AT_HEAD=$(git tag --points-at HEAD 'v*' --sort=-version:refname | head -1)
+          if [ -n "$EXISTING_AT_HEAD" ]; then
+            echo "new_tag=$EXISTING_AT_HEAD" >> "$GITHUB_OUTPUT"
+            echo "prev_tag=$LATEST"          >> "$GITHUB_OUTPUT"
+            echo "bump=none"                 >> "$GITHUB_OUTPUT"
+            echo "HEAD already tagged: $EXISTING_AT_HEAD — skipping bump."
+            exit 0
+          fi
+
           MAJOR=$(echo "${LATEST#v}" | cut -d. -f1)
           MINOR=$(echo "${LATEST#v}" | cut -d. -f2)
           PATCH=$(echo "${LATEST#v}" | cut -d. -f3)
@@ -52,6 +62,8 @@ jobs:
           else
             COMMITS=$(git log "${LATEST}..HEAD" --oneline --no-merges)
           fi
+
+          [ -n "$COMMITS" ] || { echo "No new commits since $LATEST — nothing to release."; exit 1; }
 
           FORCE="${{ github.event.inputs.bump }}"
           if [ -n "$FORCE" ]; then
@@ -160,7 +172,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ needs.prepare.outputs.new_tag }}
 
       - uses: actions/configure-pages@v5
 

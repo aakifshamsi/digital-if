@@ -53,20 +53,18 @@ jobs:
         run: |
           echo "──── Internal links ────"
           MISSING=0
-          ROOT="projects/dbeaver"
           while IFS= read -r html; do
             DIR=$(dirname "$html")
-            # Extract relative href/src values (skip anchors, external, and template literals)
-            grep -oE '(href|src)="[^"#http][^"]*"' "$html" \
-              | sed 's/.*="\(.*\)"/\1/' \
-              | grep -v '^\(http\|//\|mailto:\|tel:\|#\|javascript:\)' \
-              | while IFS= read -r link; do
-                  # Strip query strings and hashes
-                  CLEAN=$(echo "$link" | cut -d'?' -f1 | cut -d'#' -f1)
-                  [ -z "$CLEAN" ] && continue
-                  TARGET="$DIR/$CLEAN"
-                  [ -e "$TARGET" ] || { echo "BROKEN: $html → $link"; MISSING=$((MISSING+1)); }
-                done
+            while IFS= read -r link; do
+              CLEAN=$(echo "$link" | cut -d'?' -f1 | cut -d'#' -f1)
+              [ -z "$CLEAN" ] && continue
+              TARGET="$DIR/$CLEAN"
+              [ -e "$TARGET" ] || { echo "BROKEN: $html → $link"; MISSING=$((MISSING+1)); }
+            done < <(
+              grep -oE '(href|src)="[^"]*"' "$html" \
+                | sed 's/.*="\(.*\)"/\1/' \
+                | grep -vE '^(https?:|//|mailto:|tel:|#|javascript:)'
+            )
           done < <(find projects/dbeaver -name "*.html")
           [ $MISSING -eq 0 ] && echo "All internal links OK." \
             || echo "::warning::$MISSING broken internal link(s) found."
