@@ -154,12 +154,49 @@ to a free/local provider such as:
 
 ---
 
-## Roadmap (v2.0)
+## Roadmap
 
-- [ ] Real AI provider integration for content (Cloudflare Workers AI / Ollama)
-- [ ] More templates (hair salon, yoga, nutrition coach)
+### v1.0 — Foundation ✅
+- [x] dBeaver demo: multi-client website builder platform
+- [x] Admin panel (login, dashboard, clients, editor, templates)
+- [x] Client portal (login, dashboard)
+- [x] Demo site (spa/massage template)
+- [x] Apache `.htaccess` hardening + security headers
+- [x] CI/CD: GitHub Actions → GitHub Pages + CF Pages + cPanel
+- [x] Auto-versioning, CHANGELOG, GitHub Releases on merge to main
+- [x] PR sanity checks (HTML lint, JS syntax, link checker, file size guard)
+- [x] PR preview deployments (Cloudflare Pages branch previews)
+
+### v1.1 — Digital Hands Platform (active)
+- [ ] dh-platform: corporate landing page live at digitalhands.in
+- [ ] Admin CRM — client list, add/edit, notes, status
+- [ ] Invoicing manager — create, send, track, PDF export
+- [ ] Freemium site builder — 1 page free, upgrade for more
+- [ ] Marketplace — browse and purchase AI-generated website artifacts
+- [ ] Pricing page with freemium / pro / agency tiers
+
+### v1.2 — Infrastructure Bridge
+- [ ] Centralized credential manager: CF Account ID + API Token → app derives all
+  sub-credentials (Workers, R2, KV, Tunnel, DNS) — users provide two values, the rest is automatic
+- [ ] Domain manager: provision short aliases (`yourbiz.dh.in`) via CF DNS API
+- [ ] Cloudflared tunnel support: expose local/self-hosted services securely via CF Tunnel
+- [ ] Backblaze B2 integration: cheap object storage for media, backups, artifacts
+  (S3-compatible — proxied through CF Workers to eliminate egress fees)
+- [ ] cPanel/WHM bridge: shared reseller hosting API for PHP site deployments
+- [ ] Multi-cloud config sync: CF KV as the single source of truth across all environments
+
+### v1.3 — AI & Automation
+- [ ] Real AI content generation (Cloudflare Workers AI — free tier)
+- [ ] AI-generated site sections, copy, images via marketplace artifacts
+- [ ] Email automation: appointment confirmations, invoice delivery
+- [ ] WhatsApp Business integration for client notifications
 - [ ] Drag-and-drop block editor
-- [ ] Custom domain mapping
-- [ ] Stripe billing integration
-- [ ] Email notifications (appointment confirmations)
-- [ ] WhatsApp Business integration
+
+### v2.0 — Scale & Monetisation
+- [ ] Hybrid business model: freemium + affiliate + white-label + service-based
+- [ ] Affiliate / reseller program with commission tracking dashboard
+- [ ] Stripe / Razorpay billing integration
+- [ ] More templates: hair salon, yoga, nutrition coach, portfolio, SaaS landing
+- [ ] Offline-capable edge nodes: cluster across cloud + local Linux hardware
+- [ ] Cloudflared mesh: bridge cloud ↔ on-premise ↔ mobile for zero-trust access
+- [ ] Multi-tenant isolation: each client gets their own CF Pages project + subdomain
