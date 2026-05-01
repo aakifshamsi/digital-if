@@ -208,11 +208,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete Cloudflare Pages preview branch
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
+          [ -z "$CLOUDFLARE_API_TOKEN" ] && echo "CF secrets not configured — skipping cleanup." && exit 0
           BRANCH="pr-${{ github.event.pull_request.number }}"
           PROJECT="${{ secrets.CLOUDFLARE_PAGES_PROJECT }}"
           # List deployments for the branch and delete them
