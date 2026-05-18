@@ -1,4 +1,15 @@
 # Changelog
+
+## v1.6 — (In Progress)
+
+### Features
+<!-- Add v1.6 features here -->
+
+### Bug Fixes
+<!-- Add v1.6 fixes here -->
+
+---
+
 ## v0.1.0 — 2026-05-18
 ## v0.2.0 — 2026-05-18
 ## v0.2.1 — 2026-05-18

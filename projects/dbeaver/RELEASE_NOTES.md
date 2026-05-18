@@ -39,3 +39,25 @@ If these are not fixed now, merge should be treated as **non-production**.
 ### Actions
 - Tag: `v1.5` created and pushed to `origin`.
 - Recommended: run preflight checks and KV bootstrap before promoting to production.
+
+---
+
+## v1.6 — (Draft, In Progress)
+
+### Highlights
+<!-- Add v1.6 highlights here -->
+
+### Work Items
+<!-- Add v1.6 work items and tracked issues here -->
+
+### Notes
+- v1.6 bootstrap started 2026-05-18. Merge target: `main` after v1.5 validation complete.
+- Build on v1.5 base: domain connection infrastructure, magic link auth, KV-backed client data.
+
+### Readiness Checklist (Before Tag)
+- [ ] All features completed and merged to feature branch
+- [ ] Tests passing
+- [ ] Security review (hardening from v1.5 risks)
+- [ ] Staging deployment validated
+- [ ] Release notes and CHANGELOG updated
+- [ ] Tag created and pushed to origin
