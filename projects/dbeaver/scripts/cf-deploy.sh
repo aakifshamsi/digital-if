@@ -79,8 +79,11 @@ if ! command -v wrangler &>/dev/null; then
 fi
 
 # ── 3. deploy ─────────────────────────────────────────────────────────────────
-info "Deploying..."
-DEPLOY_OUT=$(wrangler pages deploy "${SITE_DIR}" \
+# IMPORTANT: wrangler looks for functions/ relative to its CWD, not relative to
+# the directory path you pass it. cd into SITE_DIR first so wrangler picks up
+# projects/dbeaver/functions/ instead of looking at the repo root /functions/.
+info "Deploying (from ${SITE_DIR})..."
+DEPLOY_OUT=$(cd "${SITE_DIR}" && wrangler pages deploy . \
   --project-name "${CF_PROJECT}" \
   --branch "${BRANCH}" \
   --commit-dirty=true 2>&1)
