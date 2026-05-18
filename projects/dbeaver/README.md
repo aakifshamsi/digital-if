@@ -126,6 +126,58 @@ then runs target-specific deployment jobs.
 
 ---
 
+## Backend (Cloudflare Pages Functions + KV)
+
+Since Sprint 1.2 the CMS is backed by Pages Functions + a KV namespace,
+so admin edits persist server-side and propagate across browsers/devices.
+localStorage stays as a write-through cache so previews without KV still render.
+
+**One-time bootstrap (after CF Pages project exists):**
+
+```bash
+export CLOUDFLARE_API_TOKEN="..."
+export CLOUDFLARE_ACCOUNT_ID="..."
+export CLOUDFLARE_PAGES_PROJECT="dh-beaver"   # default
+
+# 1. Create KV namespace + bind to Pages project (production + preview)
+bash projects/dbeaver/scripts/kv-bootstrap.sh
+# → prints DH_KV_NAMESPACE_ID=...
+
+# 2. Seed admin user, first client, default content/theme
+export DH_KV_NAMESPACE_ID="<from step 1>"
+bash projects/dbeaver/scripts/seed-kv.sh
+# → prints generated admin + client passwords
+```
+
+**Health check** — after every deploy, `cf-deploy.sh` probes `/api/health`
+and reports KV binding status. You can run it manually:
+
+```bash
+curl https://dh-beaver.pages.dev/api/health
+# → {"ok":true,"runtime":"cloudflare-pages-functions","kv":"ok",...}
+```
+
+**API surface:**
+
+| Method | Route | Auth | Purpose |
+|---|---|---|---|
+| POST | `/api/auth/login` | none | `{email, password, role}` → session cookie |
+| POST | `/api/auth/logout` | session | clear session |
+| GET | `/api/me` | session | current user |
+| GET | `/api/clients` | admin | list clients |
+| POST | `/api/clients` | admin | create client |
+| GET | `/api/clients/:id` | admin or self | client record |
+| PUT | `/api/clients/:id` | admin | update metadata |
+| GET | `/api/content/:clientId` | public | demo hydration |
+| PUT | `/api/content/:clientId` | admin or self | save content |
+| GET | `/api/theme/:clientId` | public | demo theme |
+| PUT | `/api/theme/:clientId` | admin | save theme |
+
+Auth uses PBKDF2 (100k iterations) via Web Crypto — no npm dependencies.
+Session cookies are HttpOnly + Secure + SameSite=Lax with 7-day TTL.
+
+---
+
 ## Customization
 
 ### Change demo client branding (current example: massagedowntownvancouver.com)

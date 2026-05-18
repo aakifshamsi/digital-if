@@ -49,6 +49,15 @@ jobs:
           done < <(find projects/dbeaver -name "*.js" ! -path "*/node_modules/*")
           [ $ERRORS -eq 0 ] && echo "All JS files passed." || exit 1
 
+      - name: Backend unit tests
+        run: |
+          echo "──── Functions/_shared unit tests ────"
+          for t in projects/dbeaver/tests/*.test.mjs; do
+            [ -f "$t" ] || continue
+            echo "→ $t"
+            node "$t" || { echo "FAIL: $t"; exit 1; }
+          done
+
       - name: Internal link check
         run: |
           echo "──── Internal links ────"
