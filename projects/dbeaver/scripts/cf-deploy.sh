@@ -22,7 +22,9 @@ BRANCH="${CF_BRANCH:-main}"
 PRODUCTION_BRANCH="${CF_PRODUCTION_BRANCH:-main}"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
-cf()   { curl -sf -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$@"; }
+# cf(): silent curl that NEVER fails the script on HTTP errors — callers
+#       inspect the response body for {"success":true} themselves.
+cf()   { curl -s -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$@"; }
 ok()   { printf '  \033[32m✓\033[0m %s\n' "$*"; }
 info() { printf '\033[34m▸\033[0m %s\n' "$*"; }
 warn() { printf '  \033[33m⚠\033[0m %s\n' "$*"; }
@@ -47,16 +49,26 @@ echo ""
 
 # ── 1. ensure project exists ──────────────────────────────────────────────────
 info "Checking project..."
-if cf "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PROJECT}" \
-     2>/dev/null | grep -q '"success":true'; then
+CHECK_RESP=$(cf "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PROJECT}")
+if echo "$CHECK_RESP" | grep -q '"success":[[:space:]]*true'; then
   ok "Project exists."
-else
+elif echo "$CHECK_RESP" | grep -qE '"code":[[:space:]]*(8000007|10007)'; then
+  # 8000007 / 10007 = project not found → create it
   info "Project not found — creating..."
-  cf -X POST "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
+  CREATE_RESP=$(cf -X POST "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
     -H "Content-Type: application/json" \
-    -d "{\"name\":\"${CF_PROJECT}\",\"production_branch\":\"${PRODUCTION_BRANCH}\"}" \
-    > /dev/null
-  ok "Project created."
+    -d "{\"name\":\"${CF_PROJECT}\",\"production_branch\":\"${PRODUCTION_BRANCH}\"}")
+  if echo "$CREATE_RESP" | grep -q '"success":[[:space:]]*true'; then
+    ok "Project created."
+  elif echo "$CREATE_RESP" | grep -qE '"code":[[:space:]]*8000009|already[[:space:]]exists'; then
+    # Race-safe: project came into existence between check and create
+    ok "Project already existed (race resolved)."
+  else
+    die "Project create failed: $CREATE_RESP"
+  fi
+else
+  # Some other error (auth, network, rate limit) — surface the response for debugging
+  die "Unexpected response checking project: $CHECK_RESP"
 fi
 
 # ── 2. install wrangler if missing ────────────────────────────────────────────
