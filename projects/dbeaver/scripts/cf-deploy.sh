@@ -13,7 +13,7 @@ set -euo pipefail
 
 CF_API="https://api.cloudflare.com/client/v4"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SITE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+SITE_DIR="${CUSTOM_SITE_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 # BRANCH is the deploy target (may be a preview like pr-123).
 # PRODUCTION_BRANCH is the authoritative production branch on the Pages
 # project — it must NOT track preview branches or they'd overwrite the
@@ -46,6 +46,14 @@ echo "  Branch     → ${BRANCH}"
 echo "  Production → ${PRODUCTION_BRANCH}"
 echo "  Site dir   → ${SITE_DIR}"
 echo ""
+
+if [ -d "${SITE_DIR}/functions" ]; then
+  [ -f "${SITE_DIR}/functions/api/health.js" ] || die "functions/ exists but functions/api/health.js is missing from ${SITE_DIR}"
+  info "Pages Functions payload detected:"
+  (cd "${SITE_DIR}" && find functions -maxdepth 4 -type f | sort)
+else
+  warn "No functions/ directory at ${SITE_DIR}; this deploy will be static-only."
+fi
 
 # ── 1. ensure project exists ──────────────────────────────────────────────────
 info "Checking project..."
@@ -84,25 +92,33 @@ fi
 # doesn't declare the binding explicitly. So: run kv-bootstrap first to find/
 # create the namespace, then inject [[kv_namespaces]] into wrangler.toml for
 # this deploy. Idempotent — skips injection if the block already exists.
+#
+# Pure-static sites (e.g. dh-platform) ship without a functions/ directory and
+# don't need KV at all — skip the whole block in that case so this script can
+# be reused for marketing sites.
 TOML="${SITE_DIR}/wrangler.toml"
-# Check specifically for DH_KV binding, not just any [[kv_namespaces]] block.
-has_dh_kv_binding() {
-  awk '
-    /^\[\[kv_namespaces\]\]/ {in_block=1; next}
-    /^\[\[/ {in_block=0}
-    in_block && $0 ~ /^binding[[:space:]]*=[[:space:]]*"DH_KV"/ {found=1}
-    END {exit found ? 0 : 1}
-  ' "$1"
-}
-if ! has_dh_kv_binding "$TOML"; then
-  info "KV binding not in wrangler.toml — bootstrapping..."
-  KV_OUT=$(CLOUDFLARE_PAGES_PROJECT="${CF_PROJECT}" \
-    bash "${SCRIPT_DIR}/kv-bootstrap.sh" 2>&1) || die "kv-bootstrap failed: $KV_OUT"
-  echo "$KV_OUT"
-  KV_ID=$(echo "$KV_OUT" | grep -oE 'DH_KV_NAMESPACE_ID=[a-f0-9]+' | tail -1 | cut -d'=' -f2)
-  [ -z "$KV_ID" ] && die "Could not extract DH_KV namespace ID from kv-bootstrap output"
-  printf '\n[[kv_namespaces]]\nbinding = "DH_KV"\nid = "%s"\n' "$KV_ID" >> "$TOML"
-  ok "Injected KV binding (id=${KV_ID}) into wrangler.toml for this deploy."
+if [ ! -d "${SITE_DIR}/functions" ]; then
+  info "No functions/ directory at ${SITE_DIR} — skipping KV bootstrap (pure-static site)."
+else
+  # Check specifically for DH_KV binding, not just any [[kv_namespaces]] block.
+  has_dh_kv_binding() {
+    awk '
+      /^\[\[kv_namespaces\]\]/ {in_block=1; next}
+      /^\[\[/ {in_block=0}
+      in_block && $0 ~ /^binding[[:space:]]*=[[:space:]]*"DH_KV"/ {found=1}
+      END {exit found ? 0 : 1}
+    ' "$1"
+  }
+  if ! has_dh_kv_binding "$TOML"; then
+    info "KV binding not in wrangler.toml — bootstrapping..."
+    KV_OUT=$(CLOUDFLARE_PAGES_PROJECT="${CF_PROJECT}" \
+      bash "${SCRIPT_DIR}/kv-bootstrap.sh" 2>&1) || die "kv-bootstrap failed: $KV_OUT"
+    echo "$KV_OUT"
+    KV_ID=$(echo "$KV_OUT" | grep -oE 'DH_KV_NAMESPACE_ID=[a-f0-9]+' | tail -1 | cut -d'=' -f2)
+    [ -z "$KV_ID" ] && die "Could not extract DH_KV namespace ID from kv-bootstrap output"
+    printf '\n[[kv_namespaces]]\nbinding = "DH_KV"\nid = "%s"\n' "$KV_ID" >> "$TOML"
+    ok "Injected KV binding (id=${KV_ID}) into wrangler.toml for this deploy."
+  fi
 fi
 
 # ── 3. deploy ─────────────────────────────────────────────────────────────────

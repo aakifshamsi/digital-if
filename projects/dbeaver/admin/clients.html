@@ -154,6 +154,8 @@ function renderClients() {
       <div style="display:flex; gap:8px; flex-wrap:wrap">
         <span class="badge badge-blue">${c.plan}</span>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="editClient('${c.id}')">Edit</button>
+        <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="generateMagicLink('${c.id}')">🔗 Magic link</button>
+        <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="copyDemoLink('${c.id}')">👀 Copy demo link</button>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="window.open('../editor.html?client=${c.id}','_blank')">Open Editor</button>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="deleteClient('${c.id}')">Delete</button>
       </div>`;
@@ -231,6 +233,62 @@ function deleteClient(id) {
   window.saveClients(clients);
   renderClients();
   showToast('Client deleted.', 'info');
+}
+
+// Legacy template values used in localStorage seed data don't match real
+// /templates/<slug>/ folders one-to-one — map them here so the demo URL
+// always points at an existing template directory.
+const TEMPLATE_FOLDER_MAP = {
+  'spa-massage': 'spa'
+};
+
+function resolveTemplateFolder(t) {
+  const slug = (t || 'cv').trim();
+  return TEMPLATE_FOLDER_MAP[slug] || slug;
+}
+
+async function generateMagicLink(id) {
+  try {
+    const res = await fetch(`/api/clients/${encodeURIComponent(id)}/magic-link`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    if (!res.ok) {
+      let msg = 'Could not generate magic link.';
+      try {
+        const j = await res.json();
+        if (j && j.error === 'not_found') {
+          msg = 'This client only exists in the admin browser — add them to KV (seed-kv) first.';
+        } else if (j && j.message) {
+          msg = j.message;
+        }
+      } catch (_) {}
+      showToast(msg, 'error');
+      return;
+    }
+    const { url } = await res.json();
+    await navigator.clipboard.writeText(url);
+    showToast('Magic link copied — expires in 7 days.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('Network error generating magic link.', 'error');
+  }
+}
+
+async function copyDemoLink(id) {
+  const c = window.getClients().find(x => x.id === id);
+  if (!c) return;
+  const folder = resolveTemplateFolder(c.template);
+  const url = `${location.origin}/templates/${folder}/?client=${encodeURIComponent(id)}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('Demo link copied to clipboard.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('Could not copy to clipboard.', 'error');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', renderClients);
