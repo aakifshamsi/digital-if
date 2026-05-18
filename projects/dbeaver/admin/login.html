@@ -59,17 +59,44 @@
 
 <script>
 (function() {
-  // Redirect if already logged in
   if (sessionStorage.getItem('dh_admin_auth') === 'true') {
     window.location.href = 'dashboard.html';
   }
 
-  const ADMIN_CREDS = [
+  // Legacy demo credentials used as fallback when the /api backend is unreachable
+  // (preview environments without KV seeded yet). Real auth runs through Workers + KV.
+  const FALLBACK_CREDS = [
     { email: 'admin@digitalhands.in', password: 'admin123', name: 'Admin', role: 'Super Admin' },
     { email: 'aakif@digitalhands.in', password: 'dh2024!',  name: 'Aakif', role: 'Owner' }
   ];
 
-  document.getElementById('login-form').addEventListener('submit', function(e) {
+  // Only honor the fallback on demo/preview hosts — a production backend outage
+  // must not become an auth bypass. *.pages.dev and localhost are demo/preview.
+  function fallbackAllowed() {
+    const h = location.hostname;
+    return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.pages.dev');
+  }
+
+  async function tryApiLogin(email, password) {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role: 'admin' }),
+        credentials: 'same-origin'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { ok: true, user: data.user };
+      }
+      if (res.status === 401) return { ok: false, reason: 'invalid' };
+      return { ok: false, reason: 'server', status: res.status };
+    } catch (e) {
+      return { ok: false, reason: 'network', error: e };
+    }
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const email    = document.getElementById('email').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
@@ -79,17 +106,27 @@
     btn.textContent = 'Signing in…'; btn.disabled = true;
     errEl.classList.remove('show');
 
-    setTimeout(function() {
-      const user = ADMIN_CREDS.find(u => u.email === email && u.password === password);
-      if (user) {
-        sessionStorage.setItem('dh_admin_auth', 'true');
-        sessionStorage.setItem('dh_admin_user', JSON.stringify(user));
-        window.location.href = 'dashboard.html';
-      } else {
-        errEl.classList.add('show');
-        btn.textContent = 'Sign In to Admin Panel'; btn.disabled = false;
-      }
-    }, 800);
+    const api = await tryApiLogin(email, password);
+    let user = null;
+
+    if (api.ok) {
+      user = { email: api.user.sub, name: api.user.name || 'Admin', role: api.user.role };
+    } else if (api.reason !== 'invalid' && fallbackAllowed()) {
+      // Backend unavailable AND we're on a preview/demo host — try local check
+      // so people can still try the demo. Production hosts never reach here.
+      user = FALLBACK_CREDS.find(u => u.email === email && u.password === password) || null;
+    }
+
+    if (user) {
+      sessionStorage.setItem('dh_admin_auth', 'true');
+      sessionStorage.setItem('dh_admin_user', JSON.stringify({
+        name: user.name, role: user.role || 'Admin', email: user.email
+      }));
+      window.location.href = 'dashboard.html';
+    } else {
+      errEl.classList.add('show');
+      btn.textContent = 'Sign In to Admin Panel'; btn.disabled = false;
+    }
   });
 })();
 </script>

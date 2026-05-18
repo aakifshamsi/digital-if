@@ -147,16 +147,42 @@
     }
   }
 
-  /* ── Load saved content + theme on init ── */
+  /* ── Load saved content + theme: localStorage cache → render → API refresh ── */
+  // Sync path: paint from cache (or defaults) immediately, no FOUC.
   try {
-    const theme   = JSON.parse(localStorage.getItem(THEME_KEY)   || 'null');
-    const content = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null');
-    applyTheme(theme);
-    hydrateContent(content);
+    const cachedTheme   = JSON.parse(localStorage.getItem(THEME_KEY)   || 'null');
+    const cachedContent = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null');
+    if (cachedTheme)   applyTheme(cachedTheme);
+    if (cachedContent) hydrateContent(cachedContent);
   } catch (err) {
-    console.warn('[dh-beaver] failed to load saved state:', err);
+    console.warn('[dh-beaver] failed to load cached state:', err);
   }
   observeFadeUp(document);
+
+  // Async path: pull fresh content from /api — if KV is bound this swaps in
+  // real data without a reload. Failure is silent (offline, no Functions yet).
+  function refreshFromApi() {
+    fetch('/api/content/' + encodeURIComponent(clientId), { credentials: 'same-origin' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.content) {
+          localStorage.setItem(CONTENT_KEY, JSON.stringify(data.content));
+          hydrateContent(data.content);
+        }
+      })
+      .catch(() => { /* ignore — cache is fine */ });
+
+    fetch('/api/theme/' + encodeURIComponent(clientId), { credentials: 'same-origin' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.theme) {
+          localStorage.setItem(THEME_KEY, JSON.stringify(data.theme));
+          applyTheme(data.theme);
+        }
+      })
+      .catch(() => { /* ignore */ });
+  }
+  refreshFromApi();
 
   /* ── Live preview from editor (postMessage) ── */
   window.addEventListener('message', (e) => {

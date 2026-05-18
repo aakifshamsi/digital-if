@@ -421,6 +421,7 @@ function populateClientSelector() {
    LOAD CLIENT CONTENT + THEME
 ════════════════════════════════════════════════════════════ */
 function loadClientData() {
+  // Sync read first so the form renders instantly from cache/defaults.
   workingContent = window.getContent(currentClientId);
   workingTheme   = window.getTheme(currentClientId);
   syncContentForm();
@@ -428,6 +429,37 @@ function loadClientData() {
   renderRepeaters();
   const c = window.getClients().find(x => x.id === currentClientId);
   if (c) document.getElementById('editor-title').textContent = 'Site Editor — ' + c.name;
+
+  // Snapshot of working state at fetch time. If the user edits during the
+  // in-flight refresh, the working state will diverge from these baselines
+  // and we skip the swap — otherwise stale server data could clobber edits.
+  const baselineContent = JSON.stringify(workingContent);
+  const baselineTheme   = JSON.stringify(workingTheme);
+  const fetchClientId   = currentClientId; // also guards against client switch mid-fetch
+
+  Promise.all([
+    window.fetchContent(currentClientId),
+    window.fetchTheme(currentClientId)
+  ]).then(([content, theme]) => {
+    if (fetchClientId !== currentClientId) return;
+    if (JSON.stringify(workingContent) !== baselineContent ||
+        JSON.stringify(workingTheme)   !== baselineTheme) {
+      return; // user has edited — don't overwrite with stale server data
+    }
+    const contentChanged = JSON.stringify(content) !== baselineContent;
+    const themeChanged   = JSON.stringify(theme)   !== baselineTheme;
+    if (contentChanged) {
+      workingContent = content;
+      syncContentForm();
+      renderRepeaters();
+      postToFrame({ type: 'content-update', content: workingContent });
+    }
+    if (themeChanged) {
+      workingTheme = theme;
+      syncThemeForm();
+      postToFrame({ type: 'theme-update', theme: workingTheme });
+    }
+  }).catch(() => { /* offline mode — sync cache is fine */ });
 }
 
 function syncContentForm() {
@@ -694,11 +726,30 @@ document.querySelectorAll('.preset-btn').forEach(btn => {
 /* ════════════════════════════════════════════════════════════
    SAVE
 ════════════════════════════════════════════════════════════ */
-document.getElementById('save-btn').addEventListener('click', () => {
-  window.saveContent(currentClientId, workingContent);
-  window.saveTheme(currentClientId, workingTheme);
-  window.showToast('Saved successfully', 'success');
-  // Re-post in case any non-form changes weren't yet broadcast
+document.getElementById('save-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('save-btn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  // Both functions mirror to localStorage synchronously, then PUT to /api/*.
+  const [contentRes, themeRes] = await Promise.all([
+    window.saveContent(currentClientId, workingContent),
+    window.saveTheme(currentClientId, workingTheme)
+  ]);
+
+  if (contentRes.ok && themeRes.ok && contentRes.remote && themeRes.remote) {
+    window.showToast('Saved to backend', 'success');
+  } else if (contentRes.reason === 'unauthenticated' || themeRes.reason === 'unauthenticated') {
+    window.showToast('Session expired — please sign in again', 'error');
+  } else if (contentRes.reason === 'forbidden' || themeRes.reason === 'forbidden') {
+    window.showToast('Not allowed to edit this client', 'error');
+  } else {
+    window.showToast('Saved locally (backend unreachable)', 'info');
+  }
+
+  btn.disabled = false; btn.textContent = originalLabel;
+
+  // Re-post live preview in case any non-form changes weren't yet broadcast
   postToFrame({ type: 'content-update', content: workingContent });
   postToFrame({ type: 'theme-update',   theme:   workingTheme   });
 });

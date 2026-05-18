@@ -79,12 +79,38 @@ if ! command -v wrangler &>/dev/null; then
 fi
 
 # ── 3. deploy ─────────────────────────────────────────────────────────────────
-info "Deploying..."
-wrangler pages deploy "${SITE_DIR}" \
+# IMPORTANT: wrangler looks for functions/ relative to its CWD, not relative to
+# the directory path you pass it. cd into SITE_DIR first so wrangler picks up
+# projects/dbeaver/functions/ instead of looking at the repo root /functions/.
+info "Deploying (from ${SITE_DIR})..."
+DEPLOY_OUT=$(cd "${SITE_DIR}" && wrangler pages deploy . \
   --project-name "${CF_PROJECT}" \
   --branch "${BRANCH}" \
-  --commit-dirty=true
-ok "Live → https://${CF_PROJECT}.pages.dev"
+  --commit-dirty=true 2>&1)
+echo "$DEPLOY_OUT"
+
+# Wrangler prints the deployment URL — capture it for the health probe.
+DEPLOY_URL=$(echo "$DEPLOY_OUT" | grep -oE 'https://[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev' | tail -1)
+[ -z "$DEPLOY_URL" ] && DEPLOY_URL="https://${CF_PROJECT}.pages.dev"
+ok "Live → ${DEPLOY_URL}"
+
+# ── 3b. post-deploy health probe ──────────────────────────────────────────────
+# Catches the class of failures we hit in Sprint 1.1: deploy "succeeds" but
+# the Functions don't actually route, or KV is unbound. Non-fatal — the static
+# site is already deployed — but surfaces the issue immediately.
+info "Probing /api/health..."
+HEALTH=$(curl -s --max-time 10 "${DEPLOY_URL}/api/health" 2>/dev/null || true)
+if echo "$HEALTH" | grep -q '"runtime":"cloudflare-pages-functions"'; then
+  if echo "$HEALTH" | grep -q '"kv":"ok"'; then
+    ok "Functions routing + KV binding healthy."
+  else
+    warn "Functions live but KV not bound — run scripts/kv-bootstrap.sh."
+    echo "  Response: $HEALTH"
+  fi
+else
+  warn "/api/health did not respond — Functions may still be propagating."
+  echo "  Re-run this probe in ~30s: curl ${DEPLOY_URL}/api/health"
+fi
 
 # ── 4. DNS + custom domain (skip if CF_DOMAIN not set) ───────────────────────
 DOMAIN="${CF_DOMAIN:-}"
