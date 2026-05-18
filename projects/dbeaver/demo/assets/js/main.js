@@ -189,20 +189,24 @@
   });
 
   /* ── Video lightbox ── */
+  const videoDialog = document.querySelector('#video-dialog');
+  const videoFrame  = videoDialog && videoDialog.querySelector('iframe');
   document.querySelectorAll('[data-video-open]').forEach(trigger => {
     trigger.addEventListener('click', (e) => {
       e.preventDefault();
-      const dialog = document.querySelector('#video-dialog');
-      if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
+      if (!videoDialog || typeof videoDialog.showModal !== 'function') return;
+      if (videoFrame && videoFrame.dataset.src) videoFrame.src = videoFrame.dataset.src;
+      videoDialog.showModal();
     });
   });
-  const videoDialog = document.querySelector('#video-dialog');
   if (videoDialog) {
-    videoDialog.addEventListener('click', (e) => {
-      if (e.target === videoDialog) videoDialog.close();
-    });
+    const closeVideo = () => {
+      videoDialog.close();
+      if (videoFrame) videoFrame.removeAttribute('src'); // stop video playback
+    };
+    videoDialog.addEventListener('click', (e) => { if (e.target === videoDialog) closeVideo(); });
     videoDialog.querySelectorAll('[data-video-close]').forEach(btn =>
-      btn.addEventListener('click', () => videoDialog.close())
+      btn.addEventListener('click', closeVideo)
     );
   }
 
