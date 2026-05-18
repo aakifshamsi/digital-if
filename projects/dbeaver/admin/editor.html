@@ -3,34 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site Editor — DigitalHands.in Admin</title>
+  <title>Site Editor — DigitalHands Admin</title>
   <link rel="stylesheet" href="assets/css/admin.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='28'>🤝</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%234a6cf7' rx='6'/><text y='22' x='8' font-size='16' font-weight='700' fill='%23fff' font-family='system-ui'>dH</text></svg>">
   <style>
     body { overflow: hidden; }
     .editor-wrap { display: flex; height: calc(100vh - 64px); }
-    .editor-sidebar { width: 264px; flex-shrink:0; background:var(--navy-mid); border-right:1px solid var(--border); overflow-y:auto; }
-    .editor-main   { flex:1; display:flex; flex-direction:column; background:#0a0f1e; overflow:hidden; }
+    .editor-sidebar { width: 340px; flex-shrink:0; background:var(--navy-mid); border-right:1px solid var(--border); overflow-y:auto; }
+    .editor-main { flex:1; display:flex; flex-direction:column; background:#0a0f1e; overflow:hidden; }
     .editor-toolbar { display:flex; align-items:center; gap:8px; padding:8px 16px; background:var(--navy-mid); border-bottom:1px solid var(--border); flex-shrink:0; }
-    .editor-frame  { flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center; padding:20px; }
+    .editor-frame { flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center; padding:20px; }
     .editor-frame iframe { border:none; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,.5); transition:width .3s; }
     .device-btn { background:var(--card-bg); border:1px solid var(--border); color:var(--text-mid); padding:5px 10px; border-radius:5px; cursor:pointer; font-size:.82rem; transition:all .2s; }
     .device-btn.active { border-color:var(--blue); color:var(--blue-light); background:rgba(74,108,247,.1); }
-    .panel-tab { display:flex; border-bottom:1px solid var(--border); }
-    .panel-tab-btn { flex:1; padding:10px 0; font-size:.78rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; background:none; border:none; color:var(--text-dim); cursor:pointer; transition:color .2s; border-bottom:2px solid transparent; }
+
+    .panel-tab { display:flex; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--navy-mid); z-index:5; }
+    .panel-tab-btn { flex:1; padding:11px 0; font-size:.74rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; background:none; border:none; color:var(--text-dim); cursor:pointer; transition:color .2s; border-bottom:2px solid transparent; }
     .panel-tab-btn.active { color:var(--blue-light); border-bottom-color:var(--blue); }
     .panel-content { padding:16px; display:none; }
     .panel-content.active { display:block; }
-    .field-row { margin-bottom:14px; }
-    .field-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:5px; display:block; }
-    .field-input { background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:5px; padding:8px 10px; color:var(--text); font-size:.85rem; width:100%; outline:none; }
-    .field-input:focus { border-color:var(--blue); }
+
+    /* Form fields */
+    .field-row { margin-bottom:12px; }
+    .field-label { font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:5px; display:block; }
+    .field-input, .field-textarea, .field-select {
+      background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:5px;
+      padding:8px 10px; color:var(--text); font-size:.85rem; width:100%; outline:none;
+      font-family:inherit;
+    }
+    .field-input:focus, .field-textarea:focus, .field-select:focus { border-color:var(--blue); }
+    .field-textarea { resize:vertical; min-height:60px; }
     .field-color { display:flex; align-items:center; gap:8px; }
-    .field-color input[type=color] { width:36px; height:28px; padding:2px; border:1px solid var(--border); border-radius:4px; background:none; cursor:pointer; }
+    .field-color input[type=color] { width:38px; height:30px; padding:2px; border:1px solid var(--border); border-radius:4px; background:none; cursor:pointer; }
+
+    /* Collapsible sections */
+    details.cms-section { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:8px; margin-bottom:12px; }
+    details.cms-section[open] { background:rgba(255,255,255,.03); }
+    details.cms-section > summary {
+      cursor:pointer; padding:11px 14px; font-size:.78rem; font-weight:600;
+      letter-spacing:.1em; text-transform:uppercase; color:var(--text);
+      display:flex; justify-content:space-between; align-items:center;
+      list-style:none;
+    }
+    details.cms-section > summary::-webkit-details-marker { display:none; }
+    details.cms-section > summary::after { content:'+'; color:var(--text-dim); font-size:1.1rem; transition:transform .2s; }
+    details.cms-section[open] > summary::after { content:'−'; }
+    details.cms-section > .cms-body { padding:0 14px 14px; }
+
+    /* Repeater */
+    .repeater-item {
+      background:rgba(0,0,0,.2); border:1px solid var(--border);
+      border-radius:6px; padding:12px; margin-bottom:10px; position:relative;
+    }
+    .repeater-item-head {
+      display:flex; align-items:center; gap:8px; margin-bottom:8px;
+      font-size:.74rem; font-weight:600; color:var(--text-mid);
+      letter-spacing:.08em; text-transform:uppercase;
+    }
+    .repeater-item-head .idx {
+      background:var(--blue); color:#fff; width:22px; height:22px; border-radius:50%;
+      display:inline-flex; align-items:center; justify-content:center; font-size:.7rem;
+    }
+    .repeater-item-head .remove-btn {
+      margin-left:auto; background:transparent; border:none; color:var(--red);
+      cursor:pointer; font-size:.85rem; padding:2px 6px;
+    }
+    .add-item-btn {
+      width:100%; background:rgba(74,108,247,.08); border:1px dashed rgba(74,108,247,.3);
+      color:var(--blue-light); padding:9px; border-radius:6px; cursor:pointer;
+      font-size:.78rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+      transition:all .2s;
+    }
+    .add-item-btn:hover { background:rgba(74,108,247,.15); }
+
+    /* Style presets */
+    .preset-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
+    .preset-btn {
+      background:var(--card-bg); border:1px solid var(--border);
+      color:var(--text-mid); padding:9px 8px; border-radius:6px;
+      cursor:pointer; font-size:.75rem; text-align:center; transition:all .2s;
+    }
+    .preset-btn:hover { background:var(--card-hover); }
+    .preset-btn.active { border-color:var(--blue); color:var(--blue-light); background:rgba(74,108,247,.1); }
+
+    /* Page nav */
     .page-nav { display:flex; flex-direction:column; gap:4px; padding:12px; }
-    .page-nav-btn { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; background:none; border:none; color:var(--text-mid); font-size:.84rem; cursor:pointer; width:100%; text-align:left; transition:all .2s; }
+    .page-nav-btn {
+      display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:6px;
+      background:none; border:none; color:var(--text-mid); font-size:.84rem;
+      cursor:pointer; width:100%; text-align:left; transition:all .2s;
+    }
     .page-nav-btn:hover { background:var(--card-hover); color:var(--text); }
     .page-nav-btn.active { background:rgba(74,108,247,.12); color:var(--blue-light); }
+
     .ai-btn { background:linear-gradient(135deg,#7c3aed,#4a6cf7); border:none; color:#fff; padding:9px 14px; border-radius:6px; font-size:.8rem; cursor:pointer; width:100%; margin-bottom:8px; transition:all .2s; }
     .ai-btn:hover { opacity:.88; transform:translateY(-1px); }
   </style>
@@ -41,13 +106,11 @@
   <!-- Topbar -->
   <div class="topbar">
     <a href="dashboard.html" style="color:var(--text-dim); font-size:.85rem; margin-right:12px;">← Dashboard</a>
-    <div class="topbar-title" id="editor-title">Site Editor — Serenity Spa</div>
+    <div class="topbar-title" id="editor-title">Site Editor</div>
     <div class="topbar-actions">
       <select id="client-select" class="topbar-btn" style="cursor:pointer; max-width:200px;"></select>
-      <button class="topbar-btn" onclick="showToast('Changes saved!','success')">💾 Save</button>
-      <button class="topbar-btn topbar-btn-primary" onclick="window.open('../demo/index.html','_blank')">
-        🌐 Preview Live
-      </button>
+      <button class="topbar-btn" id="save-btn">💾 Save</button>
+      <button class="topbar-btn topbar-btn-primary" id="preview-btn">🌐 Preview Live</button>
     </div>
   </div>
 
@@ -56,145 +119,219 @@
     <!-- Left panel -->
     <div class="editor-sidebar">
       <div class="panel-tab">
-        <button class="panel-tab-btn active" onclick="switchTab(this,'pages')">Pages</button>
-        <button class="panel-tab-btn" onclick="switchTab(this,'style')">Style</button>
-        <button class="panel-tab-btn" onclick="switchTab(this,'content')">Content</button>
-        <button class="panel-tab-btn" onclick="switchTab(this,'ai')">AI ✨</button>
+        <button class="panel-tab-btn active" data-tab="pages">Pages</button>
+        <button class="panel-tab-btn" data-tab="style">Style</button>
+        <button class="panel-tab-btn" data-tab="content">Content</button>
+        <button class="panel-tab-btn" data-tab="ai">AI ✨</button>
       </div>
 
       <!-- Pages Tab -->
       <div class="panel-content active" id="tab-pages">
         <div class="page-nav">
-          <button class="page-nav-btn active" onclick="loadPage('index.html',this)">🏠 Home</button>
-          <button class="page-nav-btn" onclick="loadPage('services.html',this)">💆 Services</button>
-          <button class="page-nav-btn" onclick="loadPage('about.html',this)">ℹ️ About</button>
-          <button class="page-nav-btn" onclick="loadPage('booking.html',this)">📅 Booking</button>
-          <button class="page-nav-btn" onclick="loadPage('contact.html',this)">📞 Contact</button>
+          <button class="page-nav-btn active" data-page="index.html">🏠 Home</button>
+          <button class="page-nav-btn" data-page="services.html">💆 Services</button>
+          <button class="page-nav-btn" data-page="about.html">ℹ️ About</button>
+          <button class="page-nav-btn" data-page="booking.html">📅 Booking</button>
+          <button class="page-nav-btn" data-page="contact.html">📞 Contact</button>
         </div>
         <div style="padding:0 12px 12px">
           <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Add Page</div>
-          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;"
-            onclick="showToast('Page creation — coming in v2.0','info')">+ New Page</button>
+          <button class="topbar-btn" style="width:100%; font-size:.78rem;" id="new-page-btn">+ New Page</button>
         </div>
       </div>
 
       <!-- Style Tab -->
       <div class="panel-content" id="tab-style">
-        <div style="padding:4px 0 8px">
-          <div class="field-row">
-            <label class="field-label">Primary Color (Green)</label>
-            <div class="field-color">
-              <input type="color" id="c-primary" value="#1a3a2a" oninput="applyColor('--green-deep', this.value)">
-              <input type="text" class="field-input" id="c-primary-hex" value="#1a3a2a" style="flex:1;"
-                onchange="document.getElementById('c-primary').value=this.value; applyColor('--green-deep',this.value)">
-            </div>
+        <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Theme Preset</div>
+        <div class="preset-grid">
+          <button class="preset-btn active" data-preset="jetblack">⚫ Jet Black</button>
+          <button class="preset-btn" data-preset="classic">🌿 Classic Green</button>
+          <button class="preset-btn" data-preset="ocean">🌊 Ocean Blue</button>
+          <button class="preset-btn" data-preset="rose">🌸 Rose &amp; Blush</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--border); margin:14px 0;">
+
+        <div class="field-row">
+          <label class="field-label">Background</label>
+          <div class="field-color">
+            <input type="color" id="c-black" value="#000000" data-token="black">
+            <input type="text" class="field-input" id="c-black-hex" value="#000000" style="flex:1;" data-token="black">
           </div>
-          <div class="field-row">
-            <label class="field-label">Accent Color (Gold)</label>
-            <div class="field-color">
-              <input type="color" id="c-gold" value="#c9a96e" oninput="applyColor('--gold', this.value)">
-              <input type="text" class="field-input" id="c-gold-hex" value="#c9a96e" style="flex:1;"
-                onchange="document.getElementById('c-gold').value=this.value; applyColor('--gold',this.value)">
-            </div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Card / Surface</label>
+          <div class="field-color">
+            <input type="color" id="c-card" value="#1a1a1a" data-token="black-card">
+            <input type="text" class="field-input" id="c-card-hex" value="#1a1a1a" style="flex:1;" data-token="black-card">
           </div>
-          <div class="field-row">
-            <label class="field-label">Background (Cream)</label>
-            <div class="field-color">
-              <input type="color" id="c-bg" value="#faf7f2" oninput="applyColor('--cream', this.value)">
-              <input type="text" class="field-input" id="c-bg-hex" value="#faf7f2" style="flex:1;"
-                onchange="document.getElementById('c-bg').value=this.value; applyColor('--cream',this.value)">
-            </div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Accent (Gold)</label>
+          <div class="field-color">
+            <input type="color" id="c-gold" value="#c5a47e" data-token="gold">
+            <input type="text" class="field-input" id="c-gold-hex" value="#c5a47e" style="flex:1;" data-token="gold">
           </div>
-          <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
-          <div class="field-row">
-            <label class="field-label">Font Family</label>
-            <select class="field-input" id="font-family" onchange="applyFont(this.value)">
-              <option value="Georgia, serif">Georgia (Elegant)</option>
-              <option value="'Playfair Display', serif">Playfair Display</option>
-              <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
-              <option value="'Lato', sans-serif">Lato (Modern)</option>
-              <option value="'Montserrat', sans-serif">Montserrat</option>
-            </select>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Text</label>
+          <div class="field-color">
+            <input type="color" id="c-white" value="#ffffff" data-token="white">
+            <input type="text" class="field-input" id="c-white-hex" value="#ffffff" style="flex:1;" data-token="white">
           </div>
-          <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
-          <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Presets</div>
-          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;" onclick="applyPreset('classic')">🌿 Classic Green & Gold</button>
-          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;" onclick="applyPreset('ocean')">🌊 Ocean Blue & Sand</button>
-          <button class="topbar-btn" style="width:100%; font-size:.78rem; margin-bottom:4px;" onclick="applyPreset('rose')">🌸 Rose & Blush</button>
-          <button class="topbar-btn" style="width:100%; font-size:.78rem;" onclick="applyPreset('midnight')">🌙 Midnight Luxury</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--border); margin:14px 0;">
+
+        <div class="field-row">
+          <label class="field-label">Display Font (headings)</label>
+          <select class="field-select" id="font-display">
+            <option value="'Playfair Display', Georgia, serif">Playfair Display (Jet Black default)</option>
+            <option value="Georgia, serif">Georgia (Classic)</option>
+            <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+            <option value="'Lora', serif">Lora</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Body Font</label>
+          <select class="field-select" id="font-body">
+            <option value="'Montserrat', 'Helvetica Neue', Arial, sans-serif">Montserrat (Jet Black default)</option>
+            <option value="'Lato', sans-serif">Lato (Modern)</option>
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Helvetica Neue', Arial, sans-serif">Helvetica Neue</option>
+          </select>
         </div>
       </div>
 
       <!-- Content Tab -->
       <div class="panel-content" id="tab-content">
-        <div>
-          <div class="field-row">
-            <label class="field-label">Business Name</label>
-            <input type="text" class="field-input" id="biz-name" value="Serenity Spa & Massage"
-              oninput="debounceUpdate('name', this.value)">
+
+        <!-- Site Settings -->
+        <details class="cms-section" open>
+          <summary>Site Settings</summary>
+          <div class="cms-body">
+            <div class="field-row">
+              <label class="field-label">Brand Name</label>
+              <input type="text" class="field-input" data-content="settings.brandName">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Tagline</label>
+              <input type="text" class="field-input" data-content="settings.tagline">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Site Title (browser tab)</label>
+              <input type="text" class="field-input" data-content="settings.siteName">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Phone</label>
+              <input type="text" class="field-input" data-content="settings.phone">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Email</label>
+              <input type="email" class="field-input" data-content="settings.email">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Address</label>
+              <input type="text" class="field-input" data-content="settings.address">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Business Hours</label>
+              <input type="text" class="field-input" data-content="settings.businessHours">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Facebook</label>
+              <input type="url" class="field-input" data-content="settings.social.facebook" placeholder="https://...">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Twitter / X</label>
+              <input type="url" class="field-input" data-content="settings.social.twitter" placeholder="https://...">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Instagram</label>
+              <input type="url" class="field-input" data-content="settings.social.instagram" placeholder="https://...">
+            </div>
+            <div class="field-row">
+              <label class="field-label">Dribbble</label>
+              <input type="url" class="field-input" data-content="settings.social.dribbble" placeholder="https://...">
+            </div>
           </div>
-          <div class="field-row">
-            <label class="field-label">Tagline</label>
-            <input type="text" class="field-input" id="biz-tagline" value="Spa & Massage · Vancouver"
-              oninput="debounceUpdate('tagline', this.value)">
+        </details>
+
+        <!-- Hero Slides -->
+        <details class="cms-section">
+          <summary>Hero Slides</summary>
+          <div class="cms-body">
+            <div id="hero-repeater"></div>
+            <button class="add-item-btn" data-add="heroSlides">+ Add Slide</button>
           </div>
-          <div class="field-row">
-            <label class="field-label">Hero Headline</label>
-            <textarea class="field-input" rows="3" id="biz-hero">Restore Your Body, Renew Your Spirit</textarea>
+        </details>
+
+        <!-- Services -->
+        <details class="cms-section">
+          <summary>Services</summary>
+          <div class="cms-body">
+            <div id="services-repeater"></div>
+            <button class="add-item-btn" data-add="services">+ Add Service</button>
           </div>
-          <div class="field-row">
-            <label class="field-label">Phone Number</label>
-            <input type="text" class="field-input" id="biz-phone" value="(604) 200-1234">
+        </details>
+
+        <!-- Pricing Plans -->
+        <details class="cms-section">
+          <summary>Pricing Plans</summary>
+          <div class="cms-body">
+            <div id="pricing-repeater"></div>
+            <button class="add-item-btn" data-add="pricingPlans">+ Add Plan</button>
           </div>
-          <div class="field-row">
-            <label class="field-label">Address</label>
-            <input type="text" class="field-input" id="biz-address" value="789 Granville St, #200, Vancouver BC">
+        </details>
+
+        <!-- Team Members -->
+        <details class="cms-section">
+          <summary>Team Members</summary>
+          <div class="cms-body">
+            <div id="team-repeater"></div>
+            <button class="add-item-btn" data-add="team">+ Add Team Member</button>
           </div>
-          <div class="field-row">
-            <label class="field-label">Email</label>
-            <input type="email" class="field-input" id="biz-email" value="hello@serenityspa.ca">
-          </div>
-          <button class="topbar-btn topbar-btn-primary" style="width:100%; margin-top:8px;"
-            onclick="showToast('Content saved to template!','success')">Save Content</button>
-        </div>
+        </details>
+
       </div>
 
       <!-- AI Tab -->
       <div class="panel-content" id="tab-ai">
         <div style="margin-bottom:12px; font-size:.82rem; color:var(--text-mid); line-height:1.6;">
-          Let AI write copy, generate service descriptions, and optimize SEO for your client's site.
+          Let AI write copy, generate service descriptions, and optimise SEO for your client's site.
         </div>
-        <button class="ai-btn" onclick="aiAction('headline')">✨ Generate Hero Headline</button>
-        <button class="ai-btn" onclick="aiAction('about')">✨ Write About Section</button>
-        <button class="ai-btn" onclick="aiAction('services')">✨ Generate Service Descriptions</button>
-        <button class="ai-btn" onclick="aiAction('seo')">🔍 Optimize Meta / SEO</button>
-        <button class="ai-btn" onclick="aiAction('social')">📱 Write Social Media Posts</button>
+        <button class="ai-btn" data-ai="headline">✨ Generate Hero Headline</button>
+        <button class="ai-btn" data-ai="about">✨ Write About Section</button>
+        <button class="ai-btn" data-ai="services">✨ Generate Service Descriptions</button>
+        <button class="ai-btn" data-ai="seo">🔍 Optimise Meta / SEO</button>
+        <button class="ai-btn" data-ai="social">📱 Write Social Media Posts</button>
         <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
         <div style="font-size:.72rem; color:var(--text-dim); margin-bottom:8px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;">Custom Prompt</div>
-        <textarea class="field-input" id="ai-prompt" rows="3" placeholder="e.g. Write a welcome paragraph for a modern local business website…"></textarea>
-        <button class="ai-btn" style="margin-top:8px" onclick="aiCustom()">✨ Generate</button>
+        <textarea class="field-textarea" id="ai-prompt" rows="3" placeholder="e.g. Write a welcome paragraph for a modern local business website…"></textarea>
+        <button class="ai-btn" style="margin-top:8px" id="ai-custom-btn">✨ Generate</button>
         <div id="ai-output" style="display:none; margin-top:12px; background:rgba(124,58,237,.08); border:1px solid rgba(124,58,237,.2); border-radius:6px; padding:12px; font-size:.83rem; color:var(--text-mid); line-height:1.7;"></div>
       </div>
+
     </div>
 
     <!-- Editor canvas -->
     <div class="editor-main">
       <div class="editor-toolbar">
-        <button class="device-btn active" onclick="setDevice('desktop',this)" title="Desktop">🖥</button>
-        <button class="device-btn" onclick="setDevice('tablet',this)" title="Tablet">📱</button>
-        <button class="device-btn" onclick="setDevice('mobile',this)" title="Mobile">📲</button>
+        <button class="device-btn active" data-device="desktop" title="Desktop">🖥</button>
+        <button class="device-btn" data-device="tablet" title="Tablet">📱</button>
+        <button class="device-btn" data-device="mobile" title="Mobile">📲</button>
         <div style="flex:1; text-align:center;">
           <span style="font-size:.78rem; color:var(--text-dim); font-family:monospace" id="frame-url">
             demo/index.html
           </span>
         </div>
-        <button class="device-btn" onclick="reloadFrame()" title="Refresh">🔄</button>
-        <button class="device-btn" onclick="window.open(document.getElementById('preview-frame').src,'_blank')" title="Open in new tab">↗</button>
+        <button class="device-btn" id="reload-btn" title="Refresh">🔄</button>
+        <button class="device-btn" id="newtab-btn" title="Open in new tab">↗</button>
       </div>
-      <div class="editor-frame" id="editor-frame">
+      <div class="editor-frame">
         <iframe
           id="preview-frame"
-          src="../demo/index.html"
+          src="../demo/index.html?client=cli_001"
           width="100%"
           height="900"
           title="Site Preview"
@@ -207,125 +344,414 @@
 
 <script src="assets/js/admin.js"></script>
 <script>
-// ── Populate client selector ──
-document.addEventListener('DOMContentLoaded', function() {
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════ */
+let currentClientId = 'cli_001';
+let currentPage = 'index.html';
+let workingContent = null; // populated on client switch
+let workingTheme   = null;
+const iframe = document.getElementById('preview-frame');
+
+const PRESETS = {
+  jetblack: {
+    colors: { 'black':'#000000', 'black-soft':'#111111', 'black-card':'#1a1a1a', 'gold':'#c5a47e', 'white':'#ffffff', 'gray':'#aaaaaa' },
+    fonts:  { display:"'Playfair Display', Georgia, serif", body:"'Montserrat', 'Helvetica Neue', Arial, sans-serif" }
+  },
+  classic: {
+    colors: { 'black':'#1a3a2a', 'black-soft':'#2d5a3d', 'black-card':'#faf7f2', 'gold':'#c9a96e', 'white':'#2c2c2c', 'gray':'#555' },
+    fonts:  { display:"Georgia, serif", body:"'Helvetica Neue', Arial, sans-serif" }
+  },
+  ocean: {
+    colors: { 'black':'#0d3b5e', 'black-soft':'#11507d', 'black-card':'#f5f8fa', 'gold':'#e8c96d', 'white':'#1a1a1a', 'gray':'#5a6b7a' },
+    fonts:  { display:"'Lora', serif", body:"'Inter', sans-serif" }
+  },
+  rose: {
+    colors: { 'black':'#4a1942', 'black-soft':'#6b2861', 'black-card':'#fdf5f6', 'gold':'#e8899a', 'white':'#2c2c2c', 'gray':'#777' },
+    fonts:  { display:"'Cormorant Garamond', serif", body:"'Lato', sans-serif" }
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════ */
+function postToFrame(message) {
+  if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(message, '*');
+}
+function debounce(fn, wait) {
+  let t; return function() { clearTimeout(t); t = setTimeout(() => fn.apply(this, arguments), wait); };
+}
+function setPath(obj, path, value) {
+  const keys = path.split('.');
+  let cur = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') cur[keys[i]] = {};
+    cur = cur[keys[i]];
+  }
+  cur[keys[keys.length - 1]] = value;
+}
+function getPath(obj, path) {
+  return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+
+/* ════════════════════════════════════════════════════════════
+   CLIENT SELECTOR
+════════════════════════════════════════════════════════════ */
+function populateClientSelector() {
   const sel = document.getElementById('client-select');
-  window.getClients().forEach(function(c) {
+  sel.innerHTML = '';
+  window.getClients().forEach(c => {
     const opt = document.createElement('option');
     opt.value = c.id; opt.textContent = c.name;
     sel.appendChild(opt);
   });
+  sel.value = currentClientId;
   sel.addEventListener('change', function() {
-    const c = window.getClients().find(x => x.id === this.value);
-    if (c) {
-      document.getElementById('editor-title').textContent = 'Site Editor — ' + c.name;
-      showToast('Loaded: ' + c.name, 'info');
+    currentClientId = this.value;
+    const c = window.getClients().find(x => x.id === currentClientId);
+    document.getElementById('editor-title').textContent = 'Site Editor — ' + (c ? c.name : '');
+    loadClientData();
+    iframe.src = '../demo/' + currentPage + '?client=' + currentClientId;
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   LOAD CLIENT CONTENT + THEME
+════════════════════════════════════════════════════════════ */
+function loadClientData() {
+  workingContent = window.getContent(currentClientId);
+  workingTheme   = window.getTheme(currentClientId);
+  syncContentForm();
+  syncThemeForm();
+  renderRepeaters();
+  const c = window.getClients().find(x => x.id === currentClientId);
+  if (c) document.getElementById('editor-title').textContent = 'Site Editor — ' + c.name;
+}
+
+function syncContentForm() {
+  document.querySelectorAll('[data-content]').forEach(el => {
+    const val = getPath(workingContent, el.dataset.content);
+    el.value = val == null ? '' : val;
+  });
+}
+
+function syncThemeForm() {
+  Object.entries(workingTheme.colors || {}).forEach(([token, val]) => {
+    document.querySelectorAll('[data-token="' + token + '"]').forEach(el => {
+      el.value = val;
+    });
+  });
+  if (workingTheme.fonts) {
+    document.getElementById('font-display').value = workingTheme.fonts.display || '';
+    document.getElementById('font-body').value    = workingTheme.fonts.body    || '';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   CONTENT FIELD BINDINGS (settings + simple paths)
+════════════════════════════════════════════════════════════ */
+const liveContentUpdate = debounce(() => {
+  postToFrame({ type: 'content-update', content: workingContent });
+}, 180);
+
+document.addEventListener('input', (e) => {
+  // settings.* and other dot-path content fields
+  if (e.target.matches('[data-content]')) {
+    setPath(workingContent, e.target.dataset.content, e.target.value);
+    liveContentUpdate();
+  }
+  // Theme color inputs
+  if (e.target.matches('[data-token]')) {
+    const token = e.target.dataset.token;
+    const val = e.target.value;
+    workingTheme.colors = workingTheme.colors || {};
+    workingTheme.colors[token] = val;
+    // Sync sibling input (hex ↔ color picker)
+    document.querySelectorAll('[data-token="' + token + '"]').forEach(el => { if (el !== e.target) el.value = val; });
+    postToFrame({ type: 'theme-update', theme: workingTheme });
+  }
+});
+
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'font-display') {
+    workingTheme.fonts = workingTheme.fonts || {};
+    workingTheme.fonts.display = e.target.value;
+    postToFrame({ type: 'theme-update', theme: workingTheme });
+  }
+  if (e.target.id === 'font-body') {
+    workingTheme.fonts = workingTheme.fonts || {};
+    workingTheme.fonts.body = e.target.value;
+    postToFrame({ type: 'theme-update', theme: workingTheme });
+  }
+});
+
+/* ════════════════════════════════════════════════════════════
+   REPEATERS — Hero, Services, Pricing, Team
+════════════════════════════════════════════════════════════ */
+const REPEATER_DEFS = {
+  heroSlides: {
+    containerId: 'hero-repeater',
+    label: 'Slide',
+    fields: [
+      { key: 'title',       label: 'Title' },
+      { key: 'titleAccent', label: 'Accent / Italic part' },
+      { key: 'subtitle',    label: 'Eyebrow / Subtitle' },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'image',       label: 'Background image URL' },
+      { key: 'ctaText',     label: 'Button text' },
+      { key: 'ctaLink',     label: 'Button link' }
+    ]
+  },
+  services: {
+    containerId: 'services-repeater',
+    label: 'Service',
+    fields: [
+      { key: 'number',      label: 'No.' },
+      { key: 'title',       label: 'Service title' },
+      { key: 'price',       label: 'Price label (e.g. $90 / 60 min)' },
+      { key: 'image',       label: 'Image URL' },
+      { key: 'description', label: 'Description', type: 'textarea' }
+    ]
+  },
+  pricingPlans: {
+    containerId: 'pricing-repeater',
+    label: 'Plan',
+    fields: [
+      { key: 'name',     label: 'Plan name' },
+      { key: 'subtitle', label: 'Subtitle' },
+      { key: 'price',    label: 'Price (number)' },
+      { key: 'period',   label: 'Period (e.g. /Mo)' },
+      { key: 'features', label: 'Features (one per line)', type: 'features' },
+      { key: 'ctaText',  label: 'CTA text' },
+      { key: 'ctaLink',  label: 'CTA link' },
+      { key: 'isActive', label: 'Featured (popular)', type: 'checkbox' }
+    ]
+  },
+  team: {
+    containerId: 'team-repeater',
+    label: 'Member',
+    fields: [
+      { key: 'name',  label: 'Name' },
+      { key: 'role',  label: 'Role / Title' },
+      { key: 'image', label: 'Portrait image URL' },
+      { key: 'social.facebook',  label: 'Facebook URL' },
+      { key: 'social.twitter',   label: 'Twitter URL' },
+      { key: 'social.instagram', label: 'Instagram URL' }
+    ]
+  }
+};
+
+function renderRepeaters() {
+  for (const key in REPEATER_DEFS) renderRepeater(key);
+}
+
+function renderRepeater(key) {
+  const def = REPEATER_DEFS[key];
+  const container = document.getElementById(def.containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  const items = workingContent[key] || [];
+  items.forEach((item, idx) => container.appendChild(buildRepeaterItem(key, item, idx)));
+}
+
+function buildRepeaterItem(key, item, idx) {
+  const def = REPEATER_DEFS[key];
+  const wrap = document.createElement('div');
+  wrap.className = 'repeater-item';
+  wrap.dataset.repeaterKey = key;
+  wrap.dataset.repeaterIdx = String(idx);
+
+  const head = document.createElement('div');
+  head.className = 'repeater-item-head';
+  head.innerHTML = `<span class="idx">${idx + 1}</span><span>${def.label} ${idx + 1}</span>`;
+  const rmBtn = document.createElement('button');
+  rmBtn.type = 'button'; rmBtn.className = 'remove-btn'; rmBtn.textContent = '✕ Remove';
+  rmBtn.addEventListener('click', () => {
+    workingContent[key].splice(idx, 1);
+    renderRepeater(key);
+    liveContentUpdate();
+  });
+  head.appendChild(rmBtn);
+  wrap.appendChild(head);
+
+  def.fields.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'field-row';
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label';
+    lbl.textContent = f.label;
+    row.appendChild(lbl);
+
+    let inp;
+    if (f.type === 'textarea' || f.type === 'features') {
+      inp = document.createElement('textarea');
+      inp.className = 'field-textarea';
+      inp.rows = f.type === 'features' ? 4 : 2;
+      if (f.type === 'features') {
+        const v = getPath(item, f.key);
+        inp.value = Array.isArray(v) ? v.join('\n') : (v || '');
+      } else {
+        inp.value = getPath(item, f.key) || '';
+      }
+    } else if (f.type === 'checkbox') {
+      inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.checked = !!getPath(item, f.key);
+    } else {
+      inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'field-input';
+      inp.value = getPath(item, f.key) || '';
     }
+    inp.dataset.fieldKey = f.key;
+    inp.dataset.fieldType = f.type || 'text';
+    inp.addEventListener('input', () => {
+      let val;
+      if (f.type === 'checkbox') val = inp.checked;
+      else if (f.type === 'features') val = inp.value.split('\n').map(s => s.trim()).filter(Boolean);
+      else val = inp.value;
+      setPath(workingContent[key][idx], f.key, val);
+      liveContentUpdate();
+    });
+    row.appendChild(inp);
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+/* Add new item to repeater */
+document.addEventListener('click', (e) => {
+  if (!e.target.matches('[data-add]')) return;
+  const key = e.target.dataset.add;
+  if (!workingContent[key]) workingContent[key] = [];
+  const templates = {
+    heroSlides:   { title: 'New Slide', titleAccent: '', subtitle: '', description: '', image: '', ctaText: '', ctaLink: '#' },
+    services:     { number: String(workingContent.services.length + 1).padStart(2, '0'), title: 'New Service', price: '$0', image: '', description: '' },
+    pricingPlans: { name: 'New Plan', subtitle: '', price: 0, period: '/Mo', features: [], ctaText: 'Get Now', ctaLink: '#', isActive: false },
+    team:         { name: 'New Member', role: '', image: '', social: { facebook: '', twitter: '', instagram: '' } }
+  };
+  workingContent[key].push(JSON.parse(JSON.stringify(templates[key])));
+  renderRepeater(key);
+  liveContentUpdate();
+});
+
+/* ════════════════════════════════════════════════════════════
+   TABS · PAGES · DEVICE
+════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.panel-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.panel-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
   });
 });
 
-// ── Tab switching ──
-function switchTab(btn, id) {
-  document.querySelectorAll('.panel-tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + id).classList.add('active');
-}
+document.querySelectorAll('.page-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPage = btn.dataset.page;
+    iframe.src = '../demo/' + currentPage + '?client=' + currentClientId;
+    document.getElementById('frame-url').textContent = 'demo/' + currentPage;
+  });
+});
 
-// ── Page navigation ──
-function loadPage(page, btn) {
-  document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const frame = document.getElementById('preview-frame');
-  frame.src = '../demo/' + page;
-  document.getElementById('frame-url').textContent = 'demo/' + page;
-}
+document.querySelectorAll('.device-btn').forEach(btn => {
+  if (!btn.dataset.device) return;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.device-btn[data-device]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const sizes = { desktop: '100%', tablet: '768px', mobile: '390px' };
+    iframe.style.width  = sizes[btn.dataset.device];
+    iframe.style.height = btn.dataset.device === 'desktop' ? '900px' : '700px';
+  });
+});
 
-// ── Device preview ──
-function setDevice(type, btn) {
-  document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const frame = document.getElementById('preview-frame');
-  const sizes = { desktop: '100%', tablet: '768px', mobile: '390px' };
-  frame.style.width  = sizes[type];
-  frame.style.height = type === 'desktop' ? '900px' : '700px';
-}
+document.getElementById('reload-btn').addEventListener('click', () => { iframe.src = iframe.src; });
+document.getElementById('newtab-btn').addEventListener('click', () => window.open(iframe.src, '_blank'));
+document.getElementById('preview-btn').addEventListener('click', () => window.open('../demo/index.html?client=' + currentClientId, '_blank'));
+document.getElementById('new-page-btn').addEventListener('click', () => window.showToast('Page creation — coming in v2.0', 'info'));
 
-function reloadFrame() {
-  const f = document.getElementById('preview-frame');
-  f.src = f.src;
-}
+/* ════════════════════════════════════════════════════════════
+   STYLE PRESETS
+════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const preset = PRESETS[btn.dataset.preset];
+    if (!preset) return;
+    workingTheme = JSON.parse(JSON.stringify(preset));
+    syncThemeForm();
+    postToFrame({ type: 'theme-update', theme: workingTheme });
+    window.showToast('Preset applied. Save to persist.', 'info');
+  });
+});
 
-// ── Color theme ──
-function applyColor(varName, val) {
-  // Update hex input sync
-  const hexId = varName === '--green-deep' ? 'c-primary-hex' : varName === '--gold' ? 'c-gold-hex' : 'c-bg-hex';
-  const hexEl = document.getElementById(hexId);
-  if (hexEl && document.activeElement !== hexEl) hexEl.value = val;
-  showToast('Color updated — reload preview to see changes.', 'info');
-}
+/* ════════════════════════════════════════════════════════════
+   SAVE
+════════════════════════════════════════════════════════════ */
+document.getElementById('save-btn').addEventListener('click', () => {
+  window.saveContent(currentClientId, workingContent);
+  window.saveTheme(currentClientId, workingTheme);
+  window.showToast('Saved successfully', 'success');
+  // Re-post in case any non-form changes weren't yet broadcast
+  postToFrame({ type: 'content-update', content: workingContent });
+  postToFrame({ type: 'theme-update',   theme:   workingTheme   });
+});
 
-function applyFont(val) {
-  showToast('Font set to: ' + val.split(',')[0], 'info');
-}
+/* Re-apply theme + content after iframe reload */
+iframe.addEventListener('load', () => {
+  if (workingContent) postToFrame({ type: 'content-update', content: workingContent });
+  if (workingTheme)   postToFrame({ type: 'theme-update',   theme:   workingTheme   });
+});
 
-const presets = {
-  classic:  { '--green-deep':'#1a3a2a', '--gold':'#c9a96e', '--cream':'#faf7f2' },
-  ocean:    { '--green-deep':'#0d3b5e', '--gold':'#e8c96d', '--cream':'#f5f8fa' },
-  rose:     { '--green-deep':'#4a1942', '--gold':'#e8899a', '--cream':'#fdf5f6' },
-  midnight: { '--green-deep':'#080c18', '--gold':'#e2c073', '--cream':'#f0ede8' }
-};
-function applyPreset(name) {
-  const p = presets[name];
-  if (!p) return;
-  document.getElementById('c-primary').value = p['--green-deep'];
-  document.getElementById('c-primary-hex').value = p['--green-deep'];
-  document.getElementById('c-gold').value = p['--gold'];
-  document.getElementById('c-gold-hex').value = p['--gold'];
-  document.getElementById('c-bg').value = p['--cream'];
-  document.getElementById('c-bg-hex').value = p['--cream'];
-  showToast('Preset applied! Reload preview to see.', 'success');
-}
-
-// ── Content update ──
-let _debounceTimer;
-function debounceUpdate(field, val) {
-  clearTimeout(_debounceTimer);
-  _debounceTimer = setTimeout(function() {
-    showToast('Content saved: ' + field, 'success');
-  }, 800);
-}
-
-// ── AI content generation (demo) ──
+/* ════════════════════════════════════════════════════════════
+   AI (demo)
+════════════════════════════════════════════════════════════ */
 const AI_SAMPLES = {
-  headline: 'Your Journey to Total Wellness Begins Here — Premium Massage & Spa Treatments in Downtown Vancouver.',
-  about: 'Nestled in the heart of Vancouver\'s vibrant downtown, Serenity Spa has been the city\'s most-trusted sanctuary for therapeutic massage and holistic wellness since 2012. Our team of registered massage therapists brings artistry, intuition, and clinical expertise to every session — crafting personalized treatments that go far beyond relaxation.',
-  services: 'Swedish Massage: Long, flowing strokes melt away the stress of modern life, leaving you refreshed and recharged. Deep Tissue Massage: Targeted pressure on stubborn knots and chronic tension zones — the treatment that keeps Vancouver\'s professionals moving. Hot Stone Therapy: Ancient volcanic basalt stones, heated to perfection, carry warmth deep into muscles that no hands alone can reach.',
-  seo: 'Meta title: "Best Massage Therapy in Downtown Vancouver | Serenity Spa" | Meta description: "Award-winning massage & spa treatments in Vancouver BC. Swedish, deep tissue, prenatal & hot stone. Book online — same-day available." | Keywords: massage downtown vancouver, spa vancouver, registered massage therapist, hot stone massage, prenatal massage.',
-  social: '✨ Feeling tense? We\'ve got you. 🌿 Our 90-min deep tissue massage is the reset your body has been craving — and your first visit is 15% off. Book at the link in bio. #VancouverSpa #MassageVancouver #Wellness #SelfCare'
+  headline: 'Your Journey to Total Wellness Begins Here — Premium Massage & Spa Treatments.',
+  about: 'A sanctuary nestled in the heart of the city, dedicated to therapeutic massage and holistic wellness. Our team of registered massage therapists brings artistry, intuition, and clinical expertise to every session.',
+  services: 'Swedish Massage: Long, flowing strokes melt away modern-life stress. Deep Tissue: Targeted pressure on stubborn knots. Hot Stone: Ancient volcanic basalt stones carry warmth deep into muscles that no hands alone can reach.',
+  seo: 'Meta title: "Premier Massage Therapy in Downtown Vancouver" — Meta description: "Award-winning massage & spa treatments. Swedish, deep tissue, prenatal & hot stone. Book online."',
+  social: '✨ Feeling tense? Our 90-min deep tissue massage is the reset your body has been craving — first visit 15% off. #Wellness'
 };
 
-function aiAction(type) {
-  const out = document.getElementById('ai-output');
-  out.style.display = 'block';
-  out.innerHTML = '<em style="color:var(--text-dim)">⏳ Generating with AI…</em>';
-  setTimeout(function() {
-    out.innerHTML = '<strong style="color:var(--cyan); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;">' + type.toUpperCase() + '</strong><br><br>' + AI_SAMPLES[type];
-    showToast('AI content generated!', 'success');
-  }, 1200);
-}
+document.querySelectorAll('[data-ai]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.ai;
+    const out = document.getElementById('ai-output');
+    out.style.display = 'block';
+    out.innerHTML = '<em style="color:var(--text-dim)">⏳ Generating with AI…</em>';
+    setTimeout(() => {
+      out.innerHTML = '<strong style="color:var(--cyan); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;">' + type + '</strong><br><br>' + AI_SAMPLES[type];
+      window.showToast('AI content generated', 'success');
+    }, 1200);
+  });
+});
 
-function aiCustom() {
+document.getElementById('ai-custom-btn').addEventListener('click', () => {
   const prompt = document.getElementById('ai-prompt').value.trim();
-  if (!prompt) { showToast('Please enter a prompt first.', 'error'); return; }
+  if (!prompt) { window.showToast('Please enter a prompt first.', 'error'); return; }
   const out = document.getElementById('ai-output');
   out.style.display = 'block';
   out.innerHTML = '<em style="color:var(--text-dim)">⏳ Generating…</em>';
-  setTimeout(function() {
-    out.innerHTML = '<strong style="color:var(--cyan); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;">AI Response</strong><br><br>At Serenity Spa, every treatment is a journey — from the moment you step through our doors, you\'re invited to leave the outside world behind. Whether you seek relief from chronic tension, a moment of pure indulgence, or the nurturing care of prenatal massage, our team is here to craft an experience that is uniquely, completely yours.';
-    showToast('AI content generated!', 'success');
+  setTimeout(() => {
+    out.innerHTML = '<strong style="color:var(--cyan); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;">AI Response</strong><br><br>Every treatment is a journey — from the moment you step through our doors, you\'re invited to leave the outside world behind. Whether you seek relief from chronic tension or a moment of pure indulgence, our team crafts an experience uniquely, completely yours.';
+    window.showToast('AI content generated', 'success');
   }, 1400);
-}
+});
+
+/* ════════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  populateClientSelector();
+  loadClientData();
+});
 </script>
 </body>
 </html>
