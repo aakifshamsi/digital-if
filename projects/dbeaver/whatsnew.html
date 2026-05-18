@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What's New — DH Beaver</title>
+  <meta name="description" content="Recent feature releases and improvements in DH Beaver">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234a6cf7'/><text y='22' x='5' font-size='18' font-weight='900' fill='white' font-family='system-ui'>DH</text></svg>">
+  <style>
+    :root {
+      --bg:        #0a0c12;
+      --bg-card:   #131722;
+      --border:    rgba(255,255,255,.08);
+      --text:      #e2e8f0;
+      --text-mid:  #94a3b8;
+      --text-dim:  #64748b;
+      --blue:      #4a6cf7;
+      --blue-light:#6b87ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.65; padding: 60px 20px;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: .6rem; }
+    .eyebrow {
+      display: inline-block; font-size: .72rem; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--blue-light); margin-bottom: 1rem;
+    }
+    .lead { font-size: 1.05rem; color: var(--text-mid); margin-bottom: 2.4rem; }
+    .panel {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 12px 24px;
+    }
+    .back-link {
+      display: inline-block; font-size: .85rem; color: var(--text-mid);
+      text-decoration: none; margin-top: 2.4rem;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--text); }
+    a { color: var(--blue-light); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="eyebrow">Release notes</span>
+    <h1>What's New in DH Beaver</h1>
+    <p class="lead">A running log of features and improvements you can actually see. Internal plumbing changes don't show up here — they're in our <a href="https://github.com/aakifshamsi/digital-if/blob/main/projects/dbeaver/CHANGELOG.md" target="_blank" rel="noopener noreferrer">developer changelog</a>.</p>
+    <div class="panel">
+      <div data-whatsnew-mount data-whatsnew-limit="50" data-whatsnew-base="./"></div>
+    </div>
+    <a href="admin/dashboard.html" class="back-link" id="back-link">← Back to dashboard</a>
+  </div>
+  <script>
+    (function () {
+      var back = document.getElementById('back-link');
+      back.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'admin/dashboard.html';
+        }
+      });
+    })();
+  </script>
+  <script src="admin/assets/js/whatsnew.js"></script>
+</body>
+</html>

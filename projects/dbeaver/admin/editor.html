@@ -322,7 +322,7 @@
         <button class="device-btn" data-device="mobile" title="Mobile">📲</button>
         <div style="flex:1; text-align:center;">
           <span style="font-size:.78rem; color:var(--text-dim); font-family:monospace" id="frame-url">
-            demo/index.html
+            templates/spa/index.html
           </span>
         </div>
         <button class="device-btn" id="reload-btn" title="Refresh">🔄</button>
@@ -331,7 +331,7 @@
       <div class="editor-frame">
         <iframe
           id="preview-frame"
-          src="../demo/index.html?client=cli_001"
+          src="../templates/spa/index.html?client=cli_001"
           width="100%"
           height="900"
           title="Site Preview"
@@ -352,6 +352,13 @@
 let currentClientId = 'cli_001';
 let currentPage = 'index.html';
 let workingContent = null; // populated on client switch
+
+// Resolve the current client's template id (e.g. 'spa', 'salon', 'yoga').
+// Falls back to 'spa' when the client record predates the template field.
+function currentTemplate() {
+  const c = window.getClients().find(x => x.id === currentClientId);
+  return (c && c.template) || 'spa';
+}
 let workingTheme   = null;
 const iframe = document.getElementById('preview-frame');
 
@@ -413,7 +420,9 @@ function populateClientSelector() {
     const c = window.getClients().find(x => x.id === currentClientId);
     document.getElementById('editor-title').textContent = 'Site Editor — ' + (c ? c.name : '');
     loadClientData();
-    iframe.src = '../demo/' + currentPage + '?client=' + currentClientId;
+    const tpl = currentTemplate();
+    iframe.src = '../templates/' + tpl + '/' + currentPage + '?client=' + currentClientId;
+    document.getElementById('frame-url').textContent = 'templates/' + tpl + '/' + currentPage;
   });
 }
 
@@ -686,8 +695,9 @@ document.querySelectorAll('.page-nav-btn').forEach(btn => {
     document.querySelectorAll('.page-nav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentPage = btn.dataset.page;
-    iframe.src = '../demo/' + currentPage + '?client=' + currentClientId;
-    document.getElementById('frame-url').textContent = 'demo/' + currentPage;
+    const tpl = currentTemplate();
+    iframe.src = '../templates/' + tpl + '/' + currentPage + '?client=' + currentClientId;
+    document.getElementById('frame-url').textContent = 'templates/' + tpl + '/' + currentPage;
   });
 });
 
@@ -704,7 +714,7 @@ document.querySelectorAll('.device-btn').forEach(btn => {
 
 document.getElementById('reload-btn').addEventListener('click', () => { iframe.src = iframe.src; });
 document.getElementById('newtab-btn').addEventListener('click', () => window.open(iframe.src, '_blank'));
-document.getElementById('preview-btn').addEventListener('click', () => window.open('../demo/index.html?client=' + currentClientId, '_blank'));
+document.getElementById('preview-btn').addEventListener('click', () => window.open('../templates/' + currentTemplate() + '/index.html?client=' + currentClientId, '_blank'));
 document.getElementById('new-page-btn').addEventListener('click', () => window.showToast('Page creation — coming in v2.0', 'info'));
 
 /* ════════════════════════════════════════════════════════════

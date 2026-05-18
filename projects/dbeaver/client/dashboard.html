@@ -33,7 +33,7 @@
       <h2>Welcome back! 👋</h2>
       <p id="portal-welcome-sub">Your website is live and performing well.</p>
     </div>
-    <button class="portal-cta" onclick="window.open('../demo/index.html','_blank')">
+    <button class="portal-cta" onclick="openTemplatePage('index.html')">
       🌐 View My Website
     </button>
   </div>
@@ -84,7 +84,7 @@
         </div>
         <div style="display:flex; gap:8px">
           <button class="cp-btn" style="flex:1; padding:10px;"
-            onclick="window.open('../demo/index.html','_blank')">
+            onclick="openTemplatePage('index.html')">
             View Site
           </button>
           <button style="flex:1; padding:10px; background:#f5f0e8; color:#1a3a2a; border:none; border-radius:7px; font-size:.88rem; font-weight:600; cursor:pointer;"
@@ -103,14 +103,14 @@
         </div>
         <div class="portal-card-body">
           <div class="action-list">
-            <div class="action-item" onclick="window.open('../demo/index.html','_blank')">
+            <div class="action-item" onclick="openTemplatePage('index.html')">
               <span class="action-icon">🌐</span>
               <div>
                 <div class="action-text">View Live Website</div>
                 <div class="action-sub">Open your site in a new tab</div>
               </div>
             </div>
-            <div class="action-item" onclick="window.open('../demo/booking.html','_blank')">
+            <div class="action-item" id="booking-action" onclick="openTemplatePage('booking.html')">
               <span class="action-icon">📅</span>
               <div>
                 <div class="action-text">Preview Booking Page</div>
@@ -171,6 +171,17 @@
 
   </div>
 
+  <!-- What's New — feature-level release notes -->
+  <div class="portal-card" style="margin-top:20px">
+    <div class="portal-card-header">
+      <span class="portal-card-title">✨ What's New</span>
+      <a href="../whatsnew.html" style="font-size:.78rem; color:#c9a96e;">View all →</a>
+    </div>
+    <div class="portal-card-body">
+      <div data-whatsnew-mount data-whatsnew-limit="3"></div>
+    </div>
+  </div>
+
   <!-- Recent messages -->
   <div class="portal-card" style="margin-top:20px">
     <div class="portal-card-header">
@@ -206,12 +217,27 @@
   Client portal by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a> — AI-powered websites for wellness businesses
 </div>
 
+<script src="../admin/assets/js/whatsnew.js"></script>
 <script>
 (function() {
   if (sessionStorage.getItem('dh_client_auth') !== 'true') {
     window.location.href = 'login.html';
     return;
   }
+
+  const TEMPLATE_FOLDERS = new Set(['cv', 'spa', 'salon', 'yoga']);
+  function currentTemplate() {
+    try {
+      const parsed = JSON.parse(sessionStorage.getItem('dh_client_data') || 'null');
+      const t = parsed && parsed.template ? String(parsed.template).replace(/-.*/, '') : 'spa';
+      return TEMPLATE_FOLDERS.has(t) ? t : 'spa';
+    } catch (_) { return 'spa'; }
+  }
+  window.openTemplatePage = function(page) {
+    const template = currentTemplate();
+    if (page === 'booking.html' && template !== 'spa') return;
+    window.open('../templates/' + template + '/' + page, '_blank', 'noopener,noreferrer');
+  };
 
   const raw = sessionStorage.getItem('dh_client_data');
   if (raw) {
@@ -221,6 +247,8 @@
     document.getElementById('site-domain').textContent     = c.domain || '';
     document.getElementById('portal-welcome-sub').textContent = 'Your website is live at ' + (c.domain || 'your domain') + '.';
     if (c.plan) document.getElementById('client-plan').textContent = c.plan;
+    const bookingAction = document.getElementById('booking-action');
+    if (bookingAction && currentTemplate() !== 'spa') bookingAction.style.display = 'none';
   }
 
   window.doLogout = function() {

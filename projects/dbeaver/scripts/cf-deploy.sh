@@ -78,6 +78,33 @@ if ! command -v wrangler &>/dev/null; then
   ok "Wrangler $(wrangler --version 2>/dev/null | head -1) ready."
 fi
 
+# ── 2b. ensure KV binding is in wrangler.toml ─────────────────────────────────
+# Dashboard-only bindings (set via kv-bootstrap.sh) don't always propagate to
+# branch previews — wrangler can deploy with `kv: unbound` if wrangler.toml
+# doesn't declare the binding explicitly. So: run kv-bootstrap first to find/
+# create the namespace, then inject [[kv_namespaces]] into wrangler.toml for
+# this deploy. Idempotent — skips injection if the block already exists.
+TOML="${SITE_DIR}/wrangler.toml"
+# Check specifically for DH_KV binding, not just any [[kv_namespaces]] block.
+has_dh_kv_binding() {
+  awk '
+    /^\[\[kv_namespaces\]\]/ {in_block=1; next}
+    /^\[\[/ {in_block=0}
+    in_block && $0 ~ /^binding[[:space:]]*=[[:space:]]*"DH_KV"/ {found=1}
+    END {exit found ? 0 : 1}
+  ' "$1"
+}
+if ! has_dh_kv_binding "$TOML"; then
+  info "KV binding not in wrangler.toml — bootstrapping..."
+  KV_OUT=$(CLOUDFLARE_PAGES_PROJECT="${CF_PROJECT}" \
+    bash "${SCRIPT_DIR}/kv-bootstrap.sh" 2>&1) || die "kv-bootstrap failed: $KV_OUT"
+  echo "$KV_OUT"
+  KV_ID=$(echo "$KV_OUT" | grep -oE 'DH_KV_NAMESPACE_ID=[a-f0-9]+' | tail -1 | cut -d'=' -f2)
+  [ -z "$KV_ID" ] && die "Could not extract DH_KV namespace ID from kv-bootstrap output"
+  printf '\n[[kv_namespaces]]\nbinding = "DH_KV"\nid = "%s"\n' "$KV_ID" >> "$TOML"
+  ok "Injected KV binding (id=${KV_ID}) into wrangler.toml for this deploy."
+fi
+
 # ── 3. deploy ─────────────────────────────────────────────────────────────────
 # IMPORTANT: wrangler looks for functions/ relative to its CWD, not relative to
 # the directory path you pass it. cd into SITE_DIR first so wrangler picks up

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stillpoint Yoga · Template</title>
+  <meta name="description" content="Yoga studio template — DH Beaver">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../spa/assets/css/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230f1a14'/><text y='23' x='6' font-family='serif' font-size='20' font-weight='700' fill='%23a8b89a'>S</text></svg>">
+  <style>
+    /* Yoga palette — earthy sage and cream, mindful */
+    :root {
+      --black:      #0f1a14;
+      --black-soft: #1a2820;
+      --black-card: #243528;
+      --gold:       #a8b89a;
+      --white:      #f5f1e8;
+      --gray:       #8a9489;
+      --gray-soft:  rgba(255,255,255,0.1);
+      --gold-soft:  rgba(168,184,154,.8);
+    }
+  </style>
+</head>
+<body data-template-id="yoga">
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="site-header scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name" data-edit="settings.brandName">Stillpoint</span>
+      <span class="nav-logo-tag" data-edit="settings.tagline">Yoga Studio · Brooklyn</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#classes">Classes</a></li>
+      <li><a href="#teachers">Teachers</a></li>
+      <li><a href="#schedule">Schedule</a></li>
+    </ul>
+    <div class="nav-cta"><a href="#schedule" class="btn btn-primary">Book a Class</a></div>
+    <button class="nav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" type="button"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<nav class="nav-mobile" id="mobile-menu">
+  <a href="#classes">Classes</a><a href="#teachers">Teachers</a><a href="#schedule">Schedule</a>
+  <a href="#schedule" class="btn btn-primary">Book a Class</a>
+</nav>
+
+<main id="main">
+
+<section class="hero" style="background:linear-gradient(rgba(15,26,20,.55),rgba(15,26,20,.7)),url('https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1800&q=85') center/cover; min-height:80vh; display:flex; align-items:center;">
+  <div class="container">
+    <span class="section-label" style="color:var(--gold)">Yoga Studio Template</span>
+    <h1 style="font-family:'Playfair Display',serif; font-size:clamp(2.4rem,6vw,4.6rem); color:var(--white); margin:.6rem 0 1rem;">
+      Move with Intention, <span style="color:var(--gold); font-style:italic">Breathe with Purpose</span>
+    </h1>
+    <p style="font-size:1.1rem; color:rgba(255,255,255,.85); max-width:36rem; margin-bottom:2rem;">
+      Small-group classes for every body. Beginners welcome, no experience required — just a willingness to be present.
+    </p>
+    <a href="#schedule" class="btn btn-primary">See the Schedule</a>
+  </div>
+</section>
+
+<section class="section" id="classes" style="background:var(--black)">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem">
+      <span class="section-label">Our Classes</span>
+      <h2 class="fade-up">A Practice for Every Body</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="services-grid">
+      <div class="service-card fade-up">
+        <img src="https://images.unsplash.com/photo-1588286840104-8957b019727f?w=600&q=85" alt="" loading="lazy" class="service-img">
+        <div class="service-card-body">
+          <span class="service-number">01</span>
+          <h3>Vinyasa Flow</h3>
+          <div class="service-price">$24 / 75 min</div>
+          <p>Breath-led movement that builds strength and flexibility.</p>
+        </div>
+      </div>
+      <div class="service-card fade-up fade-up-d1">
+        <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=85" alt="" loading="lazy" class="service-img">
+        <div class="service-card-body">
+          <span class="service-number">02</span>
+          <h3>Yin &amp; Restorative</h3>
+          <div class="service-price">$22 / 75 min</div>
+          <p>Long-held passive poses to release deep connective tissue.</p>
+        </div>
+      </div>
+      <div class="service-card fade-up fade-up-d2">
+        <img src="https://images.unsplash.com/photo-1599447421416-3414500d18a5?w=600&q=85" alt="" loading="lazy" class="service-img">
+        <div class="service-card-body">
+          <span class="service-number">03</span>
+          <h3>Hot Power Yoga</h3>
+          <div class="service-price">$26 / 60 min</div>
+          <p>A vigorous flow in our 95°F infrared-heated room.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="teachers" style="background:var(--black-soft)">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem">
+      <span class="section-label">Our People</span>
+      <h2 class="fade-up">Meet the Teachers</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card fade-up">
+        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=500&q=85" alt="Ana Castillo" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Ana Castillo</div><div class="team-role">Founder &amp; E-RYT 500</div></div>
+      </div>
+      <div class="team-card fade-up fade-up-d1">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&q=85" alt="Marcus Chen" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Marcus Chen</div><div class="team-role">Vinyasa &amp; Hot Yoga</div></div>
+      </div>
+      <div class="team-card fade-up fade-up-d2">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&q=85" alt="Priya Singh" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Priya Singh</div><div class="team-role">Yin, Restorative &amp; Prenatal</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="booking-cta" id="schedule">
+  <div class="container">
+    <div class="booking-cta-inner">
+      <div>
+        <h2>Begin Your Practice</h2>
+        <p>First class free for new students. No commitment, no membership required.</p>
+      </div>
+      <a href="../spa/booking.html" id="book-now-link" class="btn btn-primary">Book a Class</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer" id="footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none; padding-top:40px">
+      <span>© <span data-year>2026</span> <span data-edit="settings.brandName">Stillpoint</span> · Yoga Studio Template</span>
+      <span class="footer-powered">Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="../spa/assets/js/main.js"></script>
+<script>
+(function () {
+  var c = new URLSearchParams(location.search).get('client');
+  if (c) {
+    var link = document.getElementById('book-now-link');
+    if (link) link.href += '?client=' + encodeURIComponent(c);
+  }
+})();
+</script>
+</body>
+</html>

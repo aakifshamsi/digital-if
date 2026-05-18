@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumen Hair Studio · Template</title>
+  <meta name="description" content="Hair salon template — DH Beaver">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../spa/assets/css/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231a0e0e'/><text y='23' x='6' font-family='serif' font-size='20' font-weight='700' fill='%23d4a574'>L</text></svg>">
+  <style>
+    /* Salon palette — warm rose & cream, hair-focused */
+    :root {
+      --black:      #1a0e0e;
+      --black-soft: #2a1818;
+      --black-card: #3a2424;
+      --gold:       #d4a574;
+      --white:      #fdf6f0;
+      --gray:       #9b8b85;
+      --gray-soft:  rgba(255,255,255,0.1);
+      --gold-soft:  rgba(212,165,116,.8);
+    }
+  </style>
+</head>
+<body data-template-id="salon">
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="site-header scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name" data-edit="settings.brandName">Lumen</span>
+      <span class="nav-logo-tag" data-edit="settings.tagline">Hair Studio · Toronto</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#team">Stylists</a></li>
+      <li><a href="#book">Book</a></li>
+    </ul>
+    <div class="nav-cta"><a href="#book" class="btn btn-primary">Book Now</a></div>
+    <button class="nav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" type="button"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<nav class="nav-mobile" id="mobile-menu">
+  <a href="#services">Services</a><a href="#team">Stylists</a><a href="#book">Book</a>
+  <a href="#book" class="btn btn-primary">Book Now</a>
+</nav>
+
+<main id="main">
+
+<section class="hero" style="background:linear-gradient(rgba(26,14,14,.55),rgba(26,14,14,.7)),url('https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1800&q=85') center/cover; min-height:80vh; display:flex; align-items:center;">
+  <div class="container">
+    <span class="section-label" style="color:var(--gold)">Hair Salon Template</span>
+    <h1 style="font-family:'Playfair Display',serif; font-size:clamp(2.4rem,6vw,4.6rem); color:var(--white); margin:.6rem 0 1rem;">
+      Confidence Begins <span style="color:var(--gold); font-style:italic">With Great Hair</span>
+    </h1>
+    <p style="font-size:1.1rem; color:rgba(255,255,255,.85); max-width:36rem; margin-bottom:2rem;" data-edit="heroSlides.0.description">
+      Precision cuts, custom colour, and bespoke styling — one stylist, one chair, undivided attention.
+    </p>
+    <a href="#book" class="btn btn-primary">Book an Appointment</a>
+  </div>
+</section>
+
+<section class="section" id="services" style="background:var(--black)">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem">
+      <span class="section-label">Our Services</span>
+      <h2 class="fade-up">Cut, Colour &amp; Care</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="services-grid">
+      <div class="service-card fade-up">
+        <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=85" alt="" loading="lazy" class="service-img">
+        <div class="service-card-body">
+          <span class="service-number">01</span>
+          <h3>Signature Cut</h3>
+          <div class="service-price">$75 / 45 min</div>
+          <p>A precise cut built around your face shape and lifestyle.</p>
+        </div>
+      </div>
+      <div class="service-card fade-up fade-up-d1">
+        <img src="https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=600&q=85" alt="" loading="lazy" class="service-img">
+        <div class="service-card-body">
+          <span class="service-number">02</span>
+          <h3>Custom Colour</h3>
+          <div class="service-price">$140 / 2 hr</div>
+          <p>Single-process colour blended to bring out your natural tones.</p>
+        </div>
+      </div>
+      <div class="service-card fade-up fade-up-d2">
+        <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&q=85" alt="" loading="lazy" class="service-img">
+        <div class="service-card-body">
+          <span class="service-number">03</span>
+          <h3>Balayage</h3>
+          <div class="service-price">$220 / 3 hr</div>
+          <p>Hand-painted highlights for soft, sun-kissed dimension.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="team" style="background:var(--black-soft)">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem">
+      <span class="section-label">Our People</span>
+      <h2 class="fade-up">Meet the Stylists</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card fade-up">
+        <img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=500&q=85" alt="Sofia Reyes" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Sofia Reyes</div><div class="team-role">Founder &amp; Master Stylist</div></div>
+      </div>
+      <div class="team-card fade-up fade-up-d1">
+        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&q=85" alt="Jordan Kim" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Jordan Kim</div><div class="team-role">Colour Specialist</div></div>
+      </div>
+      <div class="team-card fade-up fade-up-d2">
+        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&q=85" alt="Emma Thompson" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Emma Thompson</div><div class="team-role">Bridal &amp; Editorial</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="booking-cta" id="book">
+  <div class="container">
+    <div class="booking-cta-inner">
+      <div>
+        <h2>Ready for a New Look?</h2>
+        <p>First-time guests get 15% off their first colour or cut.</p>
+      </div>
+      <a href="../spa/booking.html" id="book-now-link" class="btn btn-primary">Book Now</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer" id="footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none; padding-top:40px">
+      <span>© <span data-year>2026</span> <span data-edit="settings.brandName">Lumen</span> · Hair Salon Template</span>
+      <span class="footer-powered">Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="../spa/assets/js/main.js"></script>
+<script>
+(function () {
+  var c = new URLSearchParams(location.search).get('client');
+  if (c) {
+    var link = document.getElementById('book-now-link');
+    if (link) link.href += '?client=' + encodeURIComponent(c);
+  }
+})();
+</script>
+</body>
+</html>
