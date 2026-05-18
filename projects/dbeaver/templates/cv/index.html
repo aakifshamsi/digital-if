@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-edit="settings.siteName">Your Name — Portfolio</title>
+  <meta name="description" content="Personal CV and portfolio — DH Beaver">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../spa/assets/css/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230c0c0e'/><text y='23' x='6' font-family='serif' font-size='20' font-weight='700' fill='%23e6c068'>Y</text></svg>">
+  <style>
+    /* CV / portfolio palette — refined dark with warm-gold accent */
+    :root {
+      --black:      #0c0c0e;
+      --black-soft: #151518;
+      --black-card: #1f1f24;
+      --gold:       #e6c068;
+      --white:      #fafafa;
+      --gray:       #9ea0a7;
+      --gray-soft:  rgba(255,255,255,0.08);
+      --gold-soft:  rgba(230,192,104,.85);
+      --font-body:  'Inter','Helvetica Neue',Arial,sans-serif;
+    }
+    .cv-portrait {
+      width: 160px; height: 160px; border-radius: 50%; object-fit: cover;
+      border: 3px solid var(--gold); margin-bottom: 1.6rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    }
+    .cv-skills {
+      display: flex; flex-wrap: wrap; gap: 10px; margin: 1.4rem 0;
+    }
+    .cv-skill {
+      padding: 6px 14px; border: 1px solid var(--gray-soft);
+      border-radius: 999px; font-size: .82rem; color: var(--gray);
+      transition: .2s;
+    }
+    .cv-skill:hover { color: var(--gold); border-color: var(--gold-soft); }
+    .cv-link {
+      color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent;
+      transition: border-color .2s;
+    }
+    .cv-link:hover { border-color: var(--gold); }
+  </style>
+</head>
+<body data-template-id="cv">
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="site-header scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-name" data-edit="settings.brandName">Your Name</span>
+      <span class="nav-logo-tag" data-edit="settings.tagline">Your Title · Your City</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta"><a href="#contact" class="btn btn-primary">Get in touch</a></div>
+    <button class="nav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" type="button"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<nav class="nav-mobile" id="mobile-menu">
+  <a href="#about">About</a><a href="#work">Work</a><a href="#contact">Contact</a>
+  <a href="#contact" class="btn btn-primary">Get in touch</a>
+</nav>
+
+<main id="main">
+
+<section class="hero" style="min-height:88vh; display:flex; align-items:center; background:radial-gradient(ellipse at top right, rgba(230,192,104,.07), transparent 60%), var(--black);">
+  <div class="container" style="display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;">
+    <div class="fade-up">
+      <span class="section-label">CV · Portfolio Template</span>
+      <h1 style="font-family:'Playfair Display',serif; font-size:clamp(2.6rem,5.5vw,4.4rem); color:var(--white); line-height:1.05; margin:.8rem 0 1.2rem;">
+        <span data-edit="heroSlides.0.title">Hi, I'm</span>
+        <span style="display:block; color:var(--gold); font-style:italic" data-edit="heroSlides.0.titleAccent">Your Name</span>
+      </h1>
+      <p style="font-size:1.15rem; color:var(--gray); margin-bottom:.6rem;" data-edit="heroSlides.0.subtitle">
+        Designer · Developer · Photographer
+      </p>
+      <p style="font-size:1rem; color:var(--gray); max-width:34rem; line-height:1.7; margin-bottom:2rem;" data-edit="heroSlides.0.description">
+        A one-line pitch about what you do and who you do it for. Edit this from the admin panel — AI can suggest copy that matches your role.
+      </p>
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="#work" class="btn btn-primary">See my work</a>
+        <a href="#contact" class="btn" style="background:transparent; border:1px solid var(--gray-soft); color:var(--white);">Get in touch</a>
+      </div>
+    </div>
+    <div class="fade-up fade-up-d1" style="text-align:center;">
+      <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=85"
+           data-edit-src="heroSlides.0.image"
+           alt="Profile" class="cv-portrait" style="width:280px; height:280px;" loading="lazy">
+      <div style="display:flex; gap:18px; justify-content:center; margin-top:1.2rem;">
+        <a href="#" class="cv-link" data-edit-href="settings.social.linkedin">LinkedIn</a>
+        <a href="#" class="cv-link" data-edit-href="settings.social.github">GitHub</a>
+        <a href="#" class="cv-link" data-edit-href="settings.social.twitter">Twitter</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about" style="background:var(--black-soft); padding:80px 0;">
+  <div class="container" style="max-width:780px;">
+    <div style="text-align:center; margin-bottom:2.6rem">
+      <span class="section-label">About</span>
+      <h2 class="fade-up">A bit about me</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="fade-up" style="text-align:center; color:var(--gray); font-size:1.05rem; line-height:1.8;">
+      <p>Two or three sentences about your background, what drives you, and what kind of work you're looking for. Keep it specific — "I help SaaS companies design onboarding flows" beats "I'm a designer who likes design."</p>
+      <p style="margin-top:1.2rem;">You can let DH's AI assistant draft this from your role + a few keywords, then edit to taste.</p>
+    </div>
+    <div class="cv-skills fade-up" style="justify-content:center; margin-top:2rem;">
+      <span class="cv-skill">Skill One</span>
+      <span class="cv-skill">Skill Two</span>
+      <span class="cv-skill">Skill Three</span>
+      <span class="cv-skill">Skill Four</span>
+      <span class="cv-skill">Skill Five</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="work" style="background:var(--black);">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem">
+      <span class="section-label">Selected Work</span>
+      <h2 class="fade-up">Recent projects</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="team-grid" data-repeat="team">
+      <template>
+        <div class="team-card fade-up">
+          <img data-field="image" class="team-photo" loading="lazy" alt="">
+          <div class="team-card-overlay">
+            <div class="team-name" data-field="name"></div>
+            <div class="team-role" data-field="role"></div>
+          </div>
+        </div>
+      </template>
+      <div class="team-card fade-up">
+        <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=500&q=85" alt="" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Project One</div><div class="team-role">Brief description · 2024</div></div>
+      </div>
+      <div class="team-card fade-up fade-up-d1">
+        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=500&q=85" alt="" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Project Two</div><div class="team-role">Brief description · 2024</div></div>
+      </div>
+      <div class="team-card fade-up fade-up-d2">
+        <img src="https://images.unsplash.com/photo-1432888622747-4eb9a8f5a07d?w=500&q=85" alt="" class="team-photo" loading="lazy">
+        <div class="team-card-overlay"><div class="team-name">Project Three</div><div class="team-role">Brief description · 2023</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact" style="background:var(--black-soft); padding:90px 0;">
+  <div class="container" style="max-width:560px; text-align:center;">
+    <span class="section-label">Contact</span>
+    <h2 class="fade-up">Let's work together</h2>
+    <div class="divider"></div>
+    <p class="fade-up" style="color:var(--gray); font-size:1.05rem; line-height:1.7; margin:1.4rem 0 2rem;">
+      Have a project in mind? Email me directly or grab my socials below — I usually reply within a day.
+    </p>
+    <a href="mailto:you@yourname.com"
+       data-edit="settings.email"
+       data-edit-href="settings.email"
+       class="btn btn-primary" style="font-size:1rem;">you@yourname.com</a>
+    <div style="display:flex; gap:24px; justify-content:center; margin-top:2rem; flex-wrap:wrap;">
+      <a href="#" class="cv-link" data-edit-href="settings.social.linkedin">LinkedIn</a>
+      <a href="#" class="cv-link" data-edit-href="settings.social.github">GitHub</a>
+      <a href="#" class="cv-link" data-edit-href="settings.social.twitter">Twitter</a>
+      <a href="#" class="cv-link" data-edit-href="settings.social.instagram">Instagram</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer" id="footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none; padding-top:40px">
+      <span>© <span data-year>2026</span> <span data-edit="settings.brandName">Your Name</span> · Personal Site</span>
+      <span class="footer-powered">Built with <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="../spa/assets/js/main.js"></script>
+</body>
+</html>

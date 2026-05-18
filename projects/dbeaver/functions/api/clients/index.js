@@ -1,6 +1,7 @@
 import { json, err, readJSON } from '../../_shared/http.js';
 import { getJSON, putJSON, listKeys } from '../../_shared/kv.js';
 import { readSession, hashPassword } from '../../_shared/auth.js';
+import { defaultsFor, DEFAULT_TEMPLATE, TEMPLATES } from '../../_shared/templates.js';
 
 // Strip secrets before returning a client record to the wire.
 function publicClient(c) {
@@ -57,13 +58,18 @@ export async function onRequestPost({ request, env }) {
   const emailTaken = await env.DH_KV.get(`client-email:${email}`);
   if (emailTaken) return err(409, 'conflict', `Email ${email} already in use`);
 
+  // Template defaults to CV/portfolio — broadest fit for new signups.
+  // Anything not in the registry falls back to the default template.
+  const requestedTemplate = body.template || DEFAULT_TEMPLATE;
+  const template = TEMPLATES[requestedTemplate] ? requestedTemplate : DEFAULT_TEMPLATE;
+
   const record = {
     id, name,
     contact: body.contact || name,
     email:   body.publicEmail || email,
     phone:   body.phone || '',
     domain:  body.domain || '',
-    template: body.template || 'spa-massage',
+    template,
     status:  body.status || 'active',
     plan:    body.plan || 'Starter',
     created: new Date().toISOString().slice(0, 10),
@@ -78,6 +84,12 @@ export async function onRequestPost({ request, env }) {
   const index = await getJSON(env, 'clients:index', []);
   if (!index.includes(id)) index.push(id);
   await putJSON(env, 'clients:index', index);
+
+  // Seed initial content + theme from the template's defaults so the new
+  // client lands on a polished page instead of a generic placeholder.
+  const { content, theme } = defaultsFor(template);
+  await putJSON(env, `content:${id}`, content);
+  await putJSON(env, `theme:${id}`,   theme);
 
   return json({ client: publicClient(record) }, { status: 201 });
 }
