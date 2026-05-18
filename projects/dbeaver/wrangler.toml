@@ -1,3 +1,7 @@
 name = "dh-beaver"
 compatibility_date = "2025-01-01"
 pages_build_output_dir = "."
+
+[[kv_namespaces]]
+binding = "DH_KV"
+id = "2349081499a6462e9dfdac41cbe352ab"
