@@ -1,5 +1,11 @@
 # Changelog
 ## v0.1.0 — 2026-05-18
+## v0.2.0 — 2026-05-18
+
+### Features
+- feat(backend): Sprint 1.2 — Pages Functions + KV real backend (7efe38e)
+---
+
 
 ### Features
 - feat: Sprint 1.1 — Jet Black theme, real CMS editor, CF Pages CI/CD (2f4c328)
