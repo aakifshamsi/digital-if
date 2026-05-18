@@ -167,35 +167,137 @@
         </div>
       </div>
 
-      <div class="portal-card">
-        <div class="portal-card-header">
-          <span class="portal-card-title">📦 Your Plan</span>
+    <div class="portal-card" style="margin-bottom:16px">
+      <div class="portal-card-header">
+        <span class="portal-card-title">🔗 Connect Your Domain</span>
+      </div>
+      <div class="portal-card-body">
+        <div style="font-size:.82rem; color:#666; margin-bottom:14px;">
+          Point your existing domain to your new website. Three easy ways:
         </div>
-        <div class="portal-card-body">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
-            <div>
-              <div style="font-weight:700; color:#1a3a2a; font-size:1.05rem" id="client-plan">Professional</div>
-              <div style="font-size:.78rem; color:#888; margin-top:2px">Renews monthly</div>
+
+        <!-- Domain methods -->
+        <div id="domain-methods" style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px;">
+          <!-- Method 1: CNAME -->
+          <div style="padding:12px; background:#f9f7f4; border:1px solid #e2dccf; border-radius:8px; cursor:pointer;" onclick="toggleMethod('cname')">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.1rem">1️⃣</span>
+              <strong style="color:#1a3a2a; font-size:.88rem;">CNAME Method (Easiest)</strong>
+              <span id="cname-expand" style="margin-left:auto; color:#888; font-size:.9rem;">▼</span>
             </div>
-            <span style="background:#dcfce7; color:#166534; font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:20px;">Active</span>
+            <div id="cname-detail" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #ddd; font-size:.78rem; color:#555;">
+              <p style="margin:0 0 8px 0;">
+                1. Log in to your domain registrar (GoDaddy, Namecheap, etc.)
+              </p>
+              <p style="margin:0 0 8px 0;">
+                2. Find DNS settings → add or edit CNAME record:
+              </p>
+              <div style="background:#fff; border:1px solid #ddd; border-radius:5px; padding:8px; font-family:monospace; font-size:.75rem; margin:0 0 8px 0; overflow:auto;">
+                Host: www<br/>
+                Points to: dh-beaver.pages.dev
+              </div>
+              <p style="margin:0 0 8px 0;">
+                3. Wait 1–2 hours for DNS to update
+              </p>
+              <p style="margin:0;">
+                4. Click the button below to let us know
+              </p>
+            </div>
           </div>
-          <div style="font-size:.82rem; color:#666; display:flex; flex-direction:column; gap:6px;">
-            <div>✅ 5-page website</div>
-            <div>✅ Mobile responsive</div>
-            <div>✅ Online booking form</div>
-            <div>✅ SSL certificate</div>
-            <div>✅ Monthly updates</div>
-            <div>✅ Priority support</div>
+
+          <!-- Method 2: Nameserver -->
+          <div style="padding:12px; background:#f9f7f4; border:1px solid #e2dccf; border-radius:8px; cursor:pointer;" onclick="toggleMethod('ns')">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.1rem">2️⃣</span>
+              <strong style="color:#1a3a2a; font-size:.88rem;">Nameserver Method (Full Control)</strong>
+              <span id="ns-expand" style="margin-left:auto; color:#888; font-size:.9rem;">▼</span>
+            </div>
+            <div id="ns-detail" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #ddd; font-size:.78rem; color:#555;">
+              <p style="margin:0 0 8px 0;">
+                1. Log in to your domain registrar
+              </p>
+              <p style="margin:0 0 8px 0;">
+                2. Find Nameserver settings and point to Cloudflare:
+              </p>
+              <div style="background:#fff; border:1px solid #ddd; border-radius:5px; padding:8px; font-family:monospace; font-size:.75rem; margin:0 0 8px 0; overflow:auto;">
+                nora.ns.cloudflare.com<br/>
+                porter.ns.cloudflare.com
+              </div>
+              <p style="margin:0 0 8px 0;">
+                3. Tell us your domain — we'll manage DNS from there
+              </p>
+              <p style="margin:0;">
+                ✅ Gives us full control over your domain's DNS
+              </p>
+            </div>
           </div>
-          <div style="margin-top:14px; padding-top:14px; border-top:1px solid #eee; font-size:.78rem; color:#aaa; text-align:center;">
-            Managed by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer" style="color:#c9a96e">DigitalHands.in</a>
+
+          <!-- Method 3: Transfer -->
+          <div style="padding:12px; background:#f9f7f4; border:1px solid #e2dccf; border-radius:8px; cursor:pointer;" onclick="toggleMethod('transfer')">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.1rem">3️⃣</span>
+              <strong style="color:#1a3a2a; font-size:.88rem;">Domain Transfer (We Manage It)</strong>
+              <span id="transfer-expand" style="margin-left:auto; color:#888; font-size:.9rem;">▼</span>
+            </div>
+            <div id="transfer-detail" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #ddd; font-size:.78rem; color:#555;">
+              <p style="margin:0 0 8px 0;">
+                1. Request an EPP code / auth code from your current registrar
+              </p>
+              <p style="margin:0 0 8px 0;">
+                2. Tell us the EPP code and domain name
+              </p>
+              <p style="margin:0 0 8px 0;">
+                3. We transfer the domain to our registrar
+              </p>
+              <p style="margin:0;">
+                ✅ We handle all DNS and domain management
+              </p>
+            </div>
           </div>
+        </div>
+
+        <!-- Domain submission -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:.78rem; color:#666; font-weight:600;">
+            Your domain (e.g., mysite.com):
+            <input id="domain-input" type="text" placeholder="mysite.com"
+              style="margin-top:4px; width:100%; padding:8px 10px; border:1px solid #e2dccf; border-radius:7px; font-size:.88rem; box-sizing:border-box;">
+          </label>
+          <button id="domain-submit" type="button"
+            style="padding:10px; background:#1a3a2a; color:#f5f0e8; border:none; border-radius:7px; font-size:.88rem; font-weight:600; cursor:pointer;">
+            ✅ My domain is ready
+          </button>
+          <div id="domain-msg" style="font-size:.78rem; color:#666; min-height:1em;"></div>
         </div>
       </div>
     </div>
 
+    <div class="portal-card">
+      <div class="portal-card-header">
+        <span class="portal-card-title">📦 Your Plan</span>
+      </div>
+      <div class="portal-card-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+          <div>
+            <div style="font-weight:700; color:#1a3a2a; font-size:1.05rem" id="client-plan">Professional</div>
+            <div style="font-size:.78rem; color:#888; margin-top:2px">Renews monthly</div>
+          </div>
+          <span style="background:#dcfce7; color:#166534; font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:20px;">Active</span>
+        </div>
+        <div style="font-size:.82rem; color:#666; display:flex; flex-direction:column; gap:6px;">
+          <div>✅ 5-page website</div>
+          <div>✅ Mobile responsive</div>
+          <div>✅ Online booking form</div>
+          <div>✅ SSL certificate</div>
+          <div>✅ Monthly updates</div>
+          <div>✅ Priority support</div>
+        </div>
+        <div style="margin-top:14px; padding-top:14px; border-top:1px solid #eee; font-size:.78rem; color:#aaa; text-align:center;">
+          Managed by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer" style="color:#c9a96e">DigitalHands.in</a>
+        </div>
+      </div>
+    </div>
   </div>
-
   <!-- What's New — feature-level release notes -->
   <div class="portal-card" style="margin-top:20px">
     <div class="portal-card-header">
@@ -359,6 +461,73 @@
   window.contactSupport = function() {
     alert('Contact DigitalHands.in support:\n\nEmail: support@digitalhands.in\nWhatsApp: +91 XXXXX XXXXX\nHours: Mon–Fri 9am–6pm IST');
   };
+
+  // Domain connection UI toggle
+  window.toggleMethod = function(method) {
+    const methods = ['cname', 'ns', 'transfer'];
+    for (const m of methods) {
+      const detail = document.getElementById(m + '-detail');
+      const expand = document.getElementById(m + '-expand');
+      if (m === method) {
+        if (detail) {
+          const isOpen = detail.style.display !== 'none';
+          detail.style.display = isOpen ? 'none' : 'block';
+          if (expand) expand.textContent = isOpen ? '▼' : '▲';
+        }
+      } else {
+        if (detail) detail.style.display = 'none';
+        if (expand) expand.textContent = '▼';
+      }
+    }
+  };
+
+  // Domain submission: PUT /api/clients/<id> with domain field
+  const domainSubmit = document.getElementById('domain-submit');
+  if (domainSubmit) {
+    domainSubmit.addEventListener('click', async function() {
+      const msg = document.getElementById('domain-msg');
+      const domainInput = document.getElementById('domain-input');
+      const domain = (domainInput && domainInput.value || '').trim();
+      if (!domain) {
+        if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Please enter a domain name.'; }
+        return;
+      }
+      const clientId = clientData && clientData.id;
+      if (!clientId) {
+        if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Missing client ID — please sign in again.'; }
+        return;
+      }
+      domainSubmit.disabled = true;
+      if (msg) { msg.style.color = '#666'; msg.textContent = 'Submitting domain…'; }
+      try {
+        const res = await fetch('/api/clients/' + encodeURIComponent(clientId), {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain })
+        });
+        if (!res.ok) {
+          let m = 'Could not submit domain.';
+          try { const j = await res.json(); if (j && j.message) m = j.message; } catch (_) {}
+          if (msg) { msg.style.color = '#b91c1c'; msg.textContent = m; }
+          return;
+        }
+        const data = await res.json();
+        const updated = (data && data.client) || {};
+        const merged = Object.assign({}, clientData, { domain: updated.domain });
+        clientData = merged;
+        sessionStorage.setItem('dh_client_data', JSON.stringify(merged));
+        if (msg) { msg.style.color = '#166534'; msg.textContent = 'Domain submitted ✅ — we'll get it live soon!'; }
+        if (domainInput) domainInput.value = '';
+      } catch (e) {
+        console.error(e);
+        if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Network error — try again.'; }
+      } finally {
+        domainSubmit.disabled = false;
+      }
+    });
+  }
+
 })();
 </script>
 </body>
