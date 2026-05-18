@@ -89,7 +89,7 @@ ADMIN_PASS="${DH_ADMIN_PASSWORD:-$(random_pw)}"
 ADMIN_PASS_PRINTED="${DH_ADMIN_PASSWORD:+(from env)}"
 
 CLIENT_ID="cli_001"
-CLIENT_EMAIL="${DH_CLIENT_EMAIL:-client@serenityspa.ca}"
+CLIENT_EMAIL="${DH_CLIENT_EMAIL:-sabi@example.com}"
 CLIENT_PASS="${DH_CLIENT_PASS:-$(random_pw)}"
 CLIENT_PASS_PRINTED="${DH_CLIENT_PASS:+(from env)}"
 
@@ -116,12 +116,12 @@ if [ "$FORCE" -eq 1 ] || ! kv_exists "client:${CLIENT_ID}"; then
   CLIENT_RECORD=$(cat <<EOF
 {
   "id": "${CLIENT_ID}",
-  "name": "Serenity Spa & Massage",
-  "contact": "Maya Chen",
-  "email": "maya@serenityspa.ca",
-  "phone": "(604) 200-1234",
-  "domain": "massagedowntownvancouver.com",
-  "template": "spa-massage",
+  "name": "Sabi's Wellness Spa",
+  "contact": "Sabi",
+  "email": "sabi@example.com",
+  "phone": "",
+  "domain": "",
+  "template": "spa",
   "status": "active",
   "plan": "Professional",
   "created": "2024-01-15",

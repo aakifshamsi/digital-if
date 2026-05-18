@@ -244,10 +244,31 @@
 
 <script src="../admin/assets/js/whatsnew.js"></script>
 <script>
-(function() {
+(async function() {
+  async function bootstrapFromSessionCookie() {
+    try {
+      const me = await fetch('/api/me', { credentials: 'same-origin' });
+      if (!me.ok) return null;
+      const auth = await me.json();
+      const user = auth && auth.user;
+      if (!user || user.role !== 'client' || !user.clientId) return null;
+
+      const clientRes = await fetch('/api/clients/' + encodeURIComponent(user.clientId), { credentials: 'same-origin' });
+      if (!clientRes.ok) return { id: user.clientId, name: user.name || user.sub || 'Client', domain: '' };
+      return (await clientRes.json()).client;
+    } catch (e) {
+      return null;
+    }
+  }
+
   if (sessionStorage.getItem('dh_client_auth') !== 'true') {
-    window.location.href = 'login.html';
-    return;
+    const client = await bootstrapFromSessionCookie();
+    if (!client) {
+      window.location.href = 'login.html';
+      return;
+    }
+    sessionStorage.setItem('dh_client_auth', 'true');
+    sessionStorage.setItem('dh_client_data', JSON.stringify(client));
   }
 
   const TEMPLATE_FOLDERS = new Set(['cv', 'spa', 'salon', 'yoga']);
