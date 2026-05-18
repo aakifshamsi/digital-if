@@ -8,9 +8,13 @@
   'use strict';
 
   /* ── Per-client storage keys ── */
-  const clientId = new URLSearchParams(location.search).get('client') || 'cli_001';
-  const CONTENT_KEY = 'dh_content_' + clientId;
-  const THEME_KEY   = 'dh_theme_'   + clientId;
+  const clientId = new URLSearchParams(location.search).get('client');
+  // Showcase mode: template page visited without a ?client= param.
+  // Skip all hydration so the template's static HTML defaults show through.
+  const isShowcase = !clientId && !!document.body.dataset.templateId;
+  const effectiveClientId = clientId || 'cli_001';
+  const CONTENT_KEY = 'dh_content_' + effectiveClientId;
+  const THEME_KEY   = 'dh_theme_'   + effectiveClientId;
 
   /* ── Apply theme (CSS custom properties) ── */
   function applyTheme(theme) {
@@ -149,20 +153,22 @@
 
   /* ── Load saved content + theme: localStorage cache → render → API refresh ── */
   // Sync path: paint from cache (or defaults) immediately, no FOUC.
-  try {
-    const cachedTheme   = JSON.parse(localStorage.getItem(THEME_KEY)   || 'null');
-    const cachedContent = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null');
-    if (cachedTheme)   applyTheme(cachedTheme);
-    if (cachedContent) hydrateContent(cachedContent);
-  } catch (err) {
-    console.warn('[dh-beaver] failed to load cached state:', err);
+  if (!isShowcase) {
+    try {
+      const cachedTheme   = JSON.parse(localStorage.getItem(THEME_KEY)   || 'null');
+      const cachedContent = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null');
+      if (cachedTheme)   applyTheme(cachedTheme);
+      if (cachedContent) hydrateContent(cachedContent);
+    } catch (err) {
+      console.warn('[dh-beaver] failed to load cached state:', err);
+    }
   }
   observeFadeUp(document);
 
   // Async path: pull fresh content from /api — if KV is bound this swaps in
   // real data without a reload. Failure is silent (offline, no Functions yet).
   function refreshFromApi() {
-    fetch('/api/content/' + encodeURIComponent(clientId), { credentials: 'same-origin' })
+    fetch('/api/content/' + encodeURIComponent(effectiveClientId), { credentials: 'same-origin' })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data && data.content) {
@@ -172,7 +178,7 @@
       })
       .catch(() => { /* ignore — cache is fine */ });
 
-    fetch('/api/theme/' + encodeURIComponent(clientId), { credentials: 'same-origin' })
+    fetch('/api/theme/' + encodeURIComponent(effectiveClientId), { credentials: 'same-origin' })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data && data.theme) {
@@ -182,7 +188,7 @@
       })
       .catch(() => { /* ignore */ });
   }
-  refreshFromApi();
+  if (!isShowcase) refreshFromApi();
 
   /* ── Live preview from editor (postMessage) ── */
   window.addEventListener('message', (e) => {
