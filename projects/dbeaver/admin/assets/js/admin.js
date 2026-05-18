@@ -34,6 +34,10 @@
   window.doLogout = function() {
     sessionStorage.removeItem('dh_admin_auth');
     sessionStorage.removeItem('dh_admin_user');
+    // Fire-and-forget — backend cookie cleanup. UI proceeds either way.
+    try {
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch (e) { /* ignore */ }
     window.location.href = 'login.html';
   };
 
@@ -175,15 +179,12 @@
   window.DEFAULT_CONTENT = DEFAULT_CONTENT;
   window.DEFAULT_THEME   = DEFAULT_THEME;
 
+  /* ── Sync getters (used at page load; return cached/defaults instantly) ── */
   window.getContent = function(clientId) {
     const raw = localStorage.getItem(CONTENT_PREFIX + clientId);
     if (!raw) return JSON.parse(JSON.stringify(DEFAULT_CONTENT));
     try { return JSON.parse(raw); }
     catch (e) { console.warn('[dh-admin] corrupt content for', clientId, e); return JSON.parse(JSON.stringify(DEFAULT_CONTENT)); }
-  };
-
-  window.saveContent = function(clientId, content) {
-    localStorage.setItem(CONTENT_PREFIX + clientId, JSON.stringify(content));
   };
 
   window.getTheme = function(clientId) {
@@ -193,8 +194,70 @@
     catch (e) { console.warn('[dh-admin] corrupt theme for', clientId, e); return JSON.parse(JSON.stringify(DEFAULT_THEME)); }
   };
 
-  window.saveTheme = function(clientId, theme) {
+  /* ── Async fetchers: API first, then localStorage cache, then defaults. ── */
+  window.fetchContent = async function(clientId) {
+    try {
+      const res = await fetch('/api/content/' + encodeURIComponent(clientId), { credentials: 'same-origin' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.content) {
+          localStorage.setItem(CONTENT_PREFIX + clientId, JSON.stringify(data.content));
+          return data.content;
+        }
+      }
+    } catch (e) { /* fall through to cache */ }
+    return window.getContent(clientId);
+  };
+
+  window.fetchTheme = async function(clientId) {
+    try {
+      const res = await fetch('/api/theme/' + encodeURIComponent(clientId), { credentials: 'same-origin' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.theme) {
+          localStorage.setItem(THEME_PREFIX + clientId, JSON.stringify(data.theme));
+          return data.theme;
+        }
+      }
+    } catch (e) { /* fall through */ }
+    return window.getTheme(clientId);
+  };
+
+  /* ── Save: PUT to API, also mirror to localStorage so reloads are instant. ── */
+  window.saveContent = async function(clientId, content) {
+    localStorage.setItem(CONTENT_PREFIX + clientId, JSON.stringify(content));
+    try {
+      const res = await fetch('/api/content/' + encodeURIComponent(clientId), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ content })
+      });
+      if (res.ok)            return { ok: true,  remote: true  };
+      if (res.status === 401) return { ok: false, reason: 'unauthenticated' };
+      if (res.status === 403) return { ok: false, reason: 'forbidden' };
+      return { ok: true, remote: false, reason: 'server_' + res.status };
+    } catch (e) {
+      return { ok: true, remote: false, reason: 'network' };
+    }
+  };
+
+  window.saveTheme = async function(clientId, theme) {
     localStorage.setItem(THEME_PREFIX + clientId, JSON.stringify(theme));
+    try {
+      const res = await fetch('/api/theme/' + encodeURIComponent(clientId), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ theme })
+      });
+      if (res.ok)             return { ok: true,  remote: true };
+      if (res.status === 401) return { ok: false, reason: 'unauthenticated' };
+      if (res.status === 403) return { ok: false, reason: 'forbidden' };
+      return { ok: true, remote: false, reason: 'server_' + res.status };
+    } catch (e) {
+      return { ok: true, remote: false, reason: 'network' };
+    }
   };
 
   /* ── Init ── */
