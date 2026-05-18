@@ -22,7 +22,10 @@ FORCE=0
 [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && { echo "ERROR: CLOUDFLARE_ACCOUNT_ID not set"; exit 1; }
 [ -z "${DH_KV_NAMESPACE_ID:-}" ]    && { echo "ERROR: DH_KV_NAMESPACE_ID not set (run kv-bootstrap.sh first)"; exit 1; }
 
-cf() { curl -s -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$@"; }
+# --fail-with-body: non-2xx → non-zero exit AND keep the response body so callers
+# can log it. -sS: silent progress, but show errors. Pairs with set -e so KV
+# write failures bubble up immediately instead of being silently ignored.
+cf() { curl -sS --fail-with-body -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$@"; }
 ok() { printf '  \033[32m✓\033[0m %s\n' "$*"; }
 info() { printf '\033[34m▸\033[0m %s\n' "$*"; }
 
@@ -48,10 +51,15 @@ kv_put() {
 }
 
 # PBKDF2 hashing in node (matches functions/_shared/auth.js format).
+# Wrapped in an async IIFE because `node -e` defaults to CommonJS and only
+# supports top-level await with --input-type=module (Node 22+); the IIFE
+# works under any modern Node version without that flag.
 hash_pw() {
   node -e "
-    const { hashPassword } = await import('${SITE_DIR}/functions/_shared/auth.js');
-    process.stdout.write(await hashPassword(process.argv[1]));
+    (async () => {
+      const { hashPassword } = await import('${SITE_DIR}/functions/_shared/auth.js');
+      process.stdout.write(await hashPassword(process.argv[1]));
+    })().catch(err => { console.error(err); process.exit(1); });
   " "$1"
 }
 

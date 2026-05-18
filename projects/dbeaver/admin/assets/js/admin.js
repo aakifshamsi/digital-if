@@ -31,13 +31,19 @@
   }
 
   /* ── Logout ── */
-  window.doLogout = function() {
+  // keepalive: true lets the POST complete after navigation starts, so the
+  // server-side session is always invalidated even if the user clicks Sign Out
+  // and immediately closes the tab. Falls back to await for older browsers.
+  window.doLogout = async function() {
     sessionStorage.removeItem('dh_admin_auth');
     sessionStorage.removeItem('dh_admin_user');
-    // Fire-and-forget — backend cookie cleanup. UI proceeds either way.
     try {
-      fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
-    } catch (e) { /* ignore */ }
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        keepalive: true
+      });
+    } catch (e) { /* network down — sessionStorage is already cleared */ }
     window.location.href = 'login.html';
   };
 

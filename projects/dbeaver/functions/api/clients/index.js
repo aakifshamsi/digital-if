@@ -24,7 +24,16 @@ export async function onRequestGet({ request, env }) {
   return json({ clients });
 }
 
-// POST /api/clients — admin only, creates a client + content + theme
+// POST /api/clients — admin only, creates a client + content + theme.
+//
+// KNOWN LIMITATION: this performs check-then-write across 3 keys
+// (client:<id>, client-email:<email>, clients:index) without atomicity.
+// Two concurrent creates with the same email could both pass the uniqueness
+// check, and concurrent index appends could overwrite each other. For the
+// current scale (admin-only endpoint, low traffic, < 100 clients) this is
+// acceptable. When we move to multi-tenant SaaS (Sprint 2.0), replace with
+// a Durable Object single-writer lock or per-id index keys so concurrent
+// creations can't lose IDs.
 export async function onRequestPost({ request, env }) {
   const sess = await readSession(request, env);
   if (!sess) return err(401, 'unauthenticated', 'Login required');

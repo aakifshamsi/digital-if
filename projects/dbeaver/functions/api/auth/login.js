@@ -1,6 +1,6 @@
 import { json, err, readJSON } from '../../_shared/http.js';
 import { verifyPassword, writeSession, sessionCookie } from '../../_shared/auth.js';
-import { getJSON } from '../../_shared/kv.js';
+import { getJSON, requireKV } from '../../_shared/kv.js';
 
 export async function onRequestPost({ request, env }) {
   let body;
@@ -20,7 +20,8 @@ export async function onRequestPost({ request, env }) {
   if (role === 'admin') {
     user = await getJSON(env, `admin:${email}`);
   } else {
-    clientId = await env.DH_KV.get(`client-email:${email}`);
+    const kv = requireKV(env);
+    clientId = await kv.get(`client-email:${email}`);
     if (clientId) user = await getJSON(env, `client:${clientId}`);
   }
 

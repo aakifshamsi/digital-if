@@ -28,19 +28,34 @@ echo "  KV title→ ${KV_TITLE}"
 echo ""
 
 # ── 1. find or create KV namespace ────────────────────────────────────────────
+# Paginate through all namespaces so accounts with >100 don't silently miss
+# an existing one and produce a duplicate.
 info "Looking up KV namespace '${KV_TITLE}'..."
-LIST_RESP=$(cf "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces?per_page=100")
-if ! echo "$LIST_RESP" | grep -q '"success":[[:space:]]*true'; then
-  echo "ERROR: failed to list KV namespaces: $LIST_RESP"; exit 1
-fi
-
-# Extract id where title matches — light JSON parsing without jq dependency.
-NAMESPACE_ID=$(echo "$LIST_RESP" \
-  | tr ',' '\n' \
-  | grep -B1 "\"title\":\"${KV_TITLE}\"" \
-  | grep '"id":' \
-  | head -1 \
-  | sed -E 's/.*"id":"([^"]+)".*/\1/' || true)
+NAMESPACE_ID=""
+PAGE=1
+while :; do
+  LIST_RESP=$(cf "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces?per_page=100&page=${PAGE}")
+  if ! echo "$LIST_RESP" | grep -q '"success":[[:space:]]*true'; then
+    echo "ERROR: failed to list KV namespaces (page ${PAGE}): $LIST_RESP"; exit 1
+  fi
+  FOUND=$(echo "$LIST_RESP" \
+    | tr ',' '\n' \
+    | grep -B1 "\"title\":\"${KV_TITLE}\"" \
+    | grep '"id":' \
+    | head -1 \
+    | sed -E 's/.*"id":"([^"]+)".*/\1/' || true)
+  if [ -n "$FOUND" ]; then
+    NAMESPACE_ID="$FOUND"
+    break
+  fi
+  # Stop when this page returned no namespace entries (empty result array).
+  if ! echo "$LIST_RESP" | grep -q '"id":'; then
+    break
+  fi
+  PAGE=$((PAGE + 1))
+  # Hard safety cap to prevent infinite loops on malformed responses.
+  [ "$PAGE" -gt 50 ] && { echo "ERROR: namespace pagination exceeded 50 pages"; exit 1; }
+done
 
 if [ -n "${NAMESPACE_ID:-}" ]; then
   ok "Namespace exists: ${NAMESPACE_ID}"

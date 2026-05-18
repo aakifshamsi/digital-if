@@ -1,5 +1,6 @@
 // Password hashing + session tokens using Web Crypto (PBKDF2 + SHA-256).
 // No npm dependencies — these APIs are built into the Workers runtime.
+import { requireKV } from './kv.js';
 
 const PBKDF2_ITERATIONS = 100_000;
 const SALT_BYTES = 16;
@@ -48,19 +49,26 @@ export async function hashPassword(password) {
 }
 
 export async function verifyPassword(password, stored) {
+  // Any malformed/corrupted persisted hash returns false instead of throwing,
+  // so a bad record produces a clean 401 rather than a 500.
   if (typeof stored !== 'string' || !stored.startsWith('pbkdf2$')) return false;
-  const [, iterStr, saltB64, hashB64] = stored.split('$');
+  const parts = stored.split('$');
+  if (parts.length !== 4) return false;
+  const [, iterStr, saltB64, hashB64] = parts;
   const iterations = parseInt(iterStr, 10);
-  if (!iterations || !saltB64 || !hashB64) return false;
-  const salt = b64ToBuf(saltB64);
-  const computed = bufToB64(await pbkdf2(password, salt, iterations));
-  // Constant-time-ish comparison
-  if (computed.length !== hashB64.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < computed.length; i++) {
-    mismatch |= computed.charCodeAt(i) ^ hashB64.charCodeAt(i);
+  if (!Number.isFinite(iterations) || iterations <= 0 || !saltB64 || !hashB64) return false;
+  try {
+    const salt = b64ToBuf(saltB64);
+    const computed = bufToB64(await pbkdf2(password, salt, iterations));
+    if (computed.length !== hashB64.length) return false;
+    let mismatch = 0;
+    for (let i = 0; i < computed.length; i++) {
+      mismatch |= computed.charCodeAt(i) ^ hashB64.charCodeAt(i);
+    }
+    return mismatch === 0;
+  } catch {
+    return false;
   }
-  return mismatch === 0;
 }
 
 export function newSessionToken() {
@@ -93,7 +101,8 @@ export function sessionCookie(token, { clear = false } = {}) {
 export async function readSession(request, env) {
   const token = readCookie(request, SESSION_COOKIE);
   if (!token) return null;
-  const raw = await env.DH_KV.get(`session:${token}`);
+  const kv = requireKV(env);
+  const raw = await kv.get(`session:${token}`);
   if (!raw) return null;
   try {
     const sess = JSON.parse(raw);
@@ -105,15 +114,18 @@ export async function readSession(request, env) {
 }
 
 export async function writeSession(env, session) {
+  const kv = requireKV(env);
   const token = newSessionToken();
-  await env.DH_KV.put(`session:${token}`, JSON.stringify(session), {
+  await kv.put(`session:${token}`, JSON.stringify(session), {
     expirationTtl: SESSION_TTL_SECONDS
   });
   return token;
 }
 
 export async function destroySession(env, token) {
-  if (token) await env.DH_KV.delete(`session:${token}`);
+  if (!token) return;
+  const kv = requireKV(env);
+  await kv.delete(`session:${token}`);
 }
 
 export const SESSION_TTL = SESSION_TTL_SECONDS;

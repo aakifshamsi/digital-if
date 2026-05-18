@@ -17,6 +17,10 @@ ok('verify correct password', await verifyPassword(pw, hash));
 ok('verify wrong password',   !(await verifyPassword('wrong', hash)));
 ok('verify empty password',   !(await verifyPassword('', hash)));
 ok('verify bad-format hash',  !(await verifyPassword(pw, 'not-a-hash')));
+// Persistence-corruption regression: malformed components should yield false, not throw.
+ok('verify malformed b64',    !(await verifyPassword(pw, 'pbkdf2$100000$***$***')));
+ok('verify wrong part count', !(await verifyPassword(pw, 'pbkdf2$100000$salt')));
+ok('verify zero iterations',  !(await verifyPassword(pw, 'pbkdf2$0$YQ==$YQ==')));
 
 const t1 = newSessionToken();
 const t2 = newSessionToken();

@@ -52,11 +52,18 @@ jobs:
       - name: Backend unit tests
         run: |
           echo "──── Functions/_shared unit tests ────"
+          TESTS_RUN=0
           for t in projects/dbeaver/tests/*.test.mjs; do
             [ -f "$t" ] || continue
             echo "→ $t"
             node "$t" || { echo "FAIL: $t"; exit 1; }
+            TESTS_RUN=$((TESTS_RUN+1))
           done
+          if [ "$TESTS_RUN" -eq 0 ]; then
+            echo "::error::No backend tests discovered in projects/dbeaver/tests/*.test.mjs"
+            exit 1
+          fi
+          echo "Ran $TESTS_RUN test file(s)."
 
       - name: Internal link check
         run: |

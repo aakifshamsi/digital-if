@@ -70,6 +70,13 @@
     { email: 'aakif@digitalhands.in', password: 'dh2024!',  name: 'Aakif', role: 'Owner' }
   ];
 
+  // Only honor the fallback on demo/preview hosts — a production backend outage
+  // must not become an auth bypass. *.pages.dev and localhost are demo/preview.
+  function fallbackAllowed() {
+    const h = location.hostname;
+    return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.pages.dev');
+  }
+
   async function tryApiLogin(email, password) {
     try {
       const res = await fetch('/api/auth/login', {
@@ -104,8 +111,9 @@
 
     if (api.ok) {
       user = { email: api.user.sub, name: api.user.name || 'Admin', role: api.user.role };
-    } else if (api.reason !== 'invalid') {
-      // Backend unavailable — fall back to local check so previews still work.
+    } else if (api.reason !== 'invalid' && fallbackAllowed()) {
+      // Backend unavailable AND we're on a preview/demo host — try local check
+      // so people can still try the demo. Production hosts never reach here.
       user = FALLBACK_CREDS.find(u => u.email === email && u.password === password) || null;
     }
 

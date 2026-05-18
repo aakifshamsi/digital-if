@@ -153,8 +153,9 @@ bash projects/dbeaver/scripts/seed-kv.sh
 and reports KV binding status. You can run it manually:
 
 ```bash
-curl https://dh-beaver.pages.dev/api/health
+curl "https://<your-pages-domain>/api/health"
 # → {"ok":true,"runtime":"cloudflare-pages-functions","kv":"ok",...}
+# Returns HTTP 503 when KV is unbound (so monitors catch the unhealthy state).
 ```
 
 **API surface:**

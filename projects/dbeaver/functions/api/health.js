@@ -13,10 +13,11 @@ export async function onRequestGet({ env }) {
       kv = 'error';
     }
   }
+  const healthy = kv === 'ok';
   return json({
-    ok: true,
+    ok: healthy,
     runtime: 'cloudflare-pages-functions',
     kv,
     time: new Date().toISOString()
-  });
+  }, { status: healthy ? 200 : 503 });
 }
