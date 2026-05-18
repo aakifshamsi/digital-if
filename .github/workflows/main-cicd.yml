@@ -159,35 +159,12 @@ jobs:
           path: /tmp/release-notes.md
           retention-days: 7
 
-# ── Job: deploy-pages ───────────────────────────────────────────────────────
-  deploy-pages:
-    needs: prepare
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare.outputs.new_tag }}
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: projects/dbeaver/
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
 # ── Job: deploy-cf-pages ────────────────────────────────────────────────────
+# Primary production deployment. CF Pages is preferred over GitHub Pages
+# because GitHub Pages requires a public repo on Free tier, while CF Pages
+# has no such restriction and is faster on its global edge.
   deploy-cf-pages:
     needs: prepare
-    if: ${{ vars.CLOUDFLARE_ACCOUNT_ID != '' || secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -196,16 +173,16 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         env:
-          CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_PAGES_PROJECT: ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
+          CLOUDFLARE_API_TOKEN:      ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID:     ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT:  ${{ secrets.CLOUDFLARE_PAGES_PROJECT }}
           CF_DOMAIN: ${{ vars.CF_DOMAIN }}
           CF_BRANCH: main
         run: bash projects/dbeaver/scripts/cf-deploy.sh
 
 # ── Job: create-release ──────────────────────────────────────────────────────
   create-release:
-    needs: [prepare, deploy-pages]
+    needs: [prepare, deploy-cf-pages]
     runs-on: ubuntu-latest
     permissions:
       contents: write
