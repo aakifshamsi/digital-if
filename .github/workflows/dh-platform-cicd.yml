@@ -1,0 +1,46 @@
+name: DH Platform Deploy
+
+# Deploys the static marketing site at projects/dh-platform/ to its own
+# Cloudflare Pages project (dh-platform.pages.dev). Reuses cf-deploy.sh
+# via CUSTOM_SITE_DIR so we don't duplicate the project-create + deploy
+# logic. No KV bindings — the script skips that block when functions/
+# isn't present.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'projects/dh-platform/**'
+      - 'projects/dbeaver/scripts/cf-deploy.sh'
+      - '.github/workflows/dh-platform-cicd.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: dh-platform-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install wrangler
+        run: npm install -g wrangler@4 --no-audit --no-fund
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT: dh-platform
+          CUSTOM_SITE_DIR: ${{ github.workspace }}/projects/dh-platform
+          CF_BRANCH: main
+        run: bash projects/dbeaver/scripts/cf-deploy.sh

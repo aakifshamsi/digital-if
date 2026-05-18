@@ -3,6 +3,18 @@
   "entries": [
     {
       "date": "2026-05-18",
+      "version": "0.4.0",
+      "tag": "new",
+      "title": "Invite clients with a magic link",
+      "items": [
+        "Magic link login — generate a one-time URL from the clients list and paste it into WhatsApp or email; your client signs in without a password.",
+        "Copy a sharable demo URL from any client card — preview their site before they pay.",
+        "Clients can now update their own contact email and phone from the portal.",
+        "DH Platform marketing site is now on its own Cloudflare project — independent deploys, ready for digitalhands.in."
+      ]
+    },
+    {
+      "date": "2026-05-18",
       "version": "0.3.0",
       "tag": "new",
       "title": "Choose your template — CV, Spa, Salon, or Yoga",

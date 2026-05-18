@@ -142,6 +142,31 @@
         </div>
       </div>
 
+      <div class="portal-card" style="margin-bottom:16px">
+        <div class="portal-card-header">
+          <span class="portal-card-title">👤 Profile</span>
+        </div>
+        <div class="portal-card-body">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <label style="font-size:.78rem; color:#666; font-weight:600;">
+              Email
+              <input id="profile-email" type="email" autocomplete="email"
+                style="margin-top:4px; width:100%; padding:8px 10px; border:1px solid #e2dccf; border-radius:7px; font-size:.88rem; box-sizing:border-box;">
+            </label>
+            <label style="font-size:.78rem; color:#666; font-weight:600;">
+              Phone
+              <input id="profile-phone" type="tel" autocomplete="tel"
+                style="margin-top:4px; width:100%; padding:8px 10px; border:1px solid #e2dccf; border-radius:7px; font-size:.88rem; box-sizing:border-box;">
+            </label>
+            <button id="profile-save" type="button"
+              style="margin-top:4px; padding:10px; background:#1a3a2a; color:#f5f0e8; border:none; border-radius:7px; font-size:.88rem; font-weight:600; cursor:pointer;">
+              Save changes
+            </button>
+            <div id="profile-msg" style="font-size:.78rem; color:#666; min-height:1em;"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="portal-card">
         <div class="portal-card-header">
           <span class="portal-card-title">📦 Your Plan</span>
@@ -240,8 +265,10 @@
   };
 
   const raw = sessionStorage.getItem('dh_client_data');
+  let clientData = null;
   if (raw) {
-    const c = JSON.parse(raw);
+    clientData = JSON.parse(raw);
+    const c = clientData;
     document.getElementById('client-name').textContent     = c.name || 'My Business';
     document.getElementById('portal-user-email').textContent = c.login ? c.login.email : '';
     document.getElementById('site-domain').textContent     = c.domain || '';
@@ -249,6 +276,57 @@
     if (c.plan) document.getElementById('client-plan').textContent = c.plan;
     const bookingAction = document.getElementById('booking-action');
     if (bookingAction && currentTemplate() !== 'spa') bookingAction.style.display = 'none';
+
+    // Prefill profile fields from the cached client record.
+    const emailInput = document.getElementById('profile-email');
+    const phoneInput = document.getElementById('profile-phone');
+    if (emailInput) emailInput.value = c.email || (c.login && c.login.email) || '';
+    if (phoneInput) phoneInput.value = c.phone || '';
+  }
+
+  // Profile save: PUT /api/clients/<id> with the narrow client whitelist
+  // (server enforces email + phone only for role=client). Mirrors changes
+  // back into sessionStorage so the header refreshes on next render.
+  const saveBtn = document.getElementById('profile-save');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async function() {
+      const msg = document.getElementById('profile-msg');
+      const email = (document.getElementById('profile-email').value || '').trim();
+      const phone = (document.getElementById('profile-phone').value || '').trim();
+      const clientId = clientData && clientData.id;
+      if (!clientId) {
+        if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Missing client ID — please sign in again.'; }
+        return;
+      }
+      saveBtn.disabled = true;
+      if (msg) { msg.style.color = '#666'; msg.textContent = 'Saving…'; }
+      try {
+        const res = await fetch('/api/clients/' + encodeURIComponent(clientId), {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, phone })
+        });
+        if (!res.ok) {
+          let m = 'Could not save profile.';
+          try { const j = await res.json(); if (j && j.message) m = j.message; } catch (_) {}
+          if (msg) { msg.style.color = '#b91c1c'; msg.textContent = m; }
+          return;
+        }
+        const data = await res.json();
+        const updated = (data && data.client) || {};
+        // Merge updates into the cached record so the UI reflects new email.
+        const merged = Object.assign({}, clientData, { email: updated.email, phone: updated.phone });
+        clientData = merged;
+        sessionStorage.setItem('dh_client_data', JSON.stringify(merged));
+        if (msg) { msg.style.color = '#166534'; msg.textContent = 'Profile saved ✅'; }
+      } catch (e) {
+        console.error(e);
+        if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Network error — try again.'; }
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
   }
 
   window.doLogout = function() {
