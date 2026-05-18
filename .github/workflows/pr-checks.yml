@@ -31,10 +31,10 @@ jobs:
           echo "──── HTML validation ────"
           ERRORS=0
           while IFS= read -r f; do
-            OUT=$(htmlhint "$f" 2>&1) || true
-            if echo "$OUT" | grep -qE 'error|Error'; then
+            # Use htmlhint's exit code (1 = errors found) instead of grepping output,
+            # since "no errors found" matches /error/ and would false-positive.
+            if ! htmlhint "$f"; then
               echo "FAIL: $f"
-              echo "$OUT"
               ERRORS=$((ERRORS+1))
             fi
           done < <(find projects/dbeaver -name "*.html")
@@ -61,13 +61,19 @@ jobs:
               TARGET="$DIR/$CLEAN"
               [ -e "$TARGET" ] || { echo "BROKEN: $html → $link"; MISSING=$((MISSING+1)); }
             done < <(
-              grep -oE '(href|src)="[^"]*"' "$html" \
-                | sed 's/.*="\(.*\)"/\1/' \
-                | grep -vE '^(https?:|//|mailto:|tel:|#|javascript:)'
+              # Match a real attribute (preceded by whitespace) so data-edit-href etc. don't leak.
+              # Then strip external/anchor/data-URI schemes from the values.
+              grep -oE '[[:space:]](href|src)="[^"]*"' "$html" \
+                | sed -E 's/^[[:space:]]+//; s/.*="(.*)"/\1/' \
+                | grep -vE '^(https?:|//|mailto:|tel:|#|javascript:|data:)'
             )
           done < <(find projects/dbeaver -name "*.html")
-          [ $MISSING -eq 0 ] && echo "All internal links OK." \
-            || echo "::warning::$MISSING broken internal link(s) found."
+          if [ $MISSING -eq 0 ]; then
+            echo "All internal links OK."
+          else
+            echo "::error::$MISSING broken internal link(s) found."
+            exit 1
+          fi
 
       - name: File size guard
         run: |

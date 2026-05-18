@@ -14,7 +14,12 @@ set -euo pipefail
 CF_API="https://api.cloudflare.com/client/v4"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SITE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+# BRANCH is the deploy target (may be a preview like pr-123).
+# PRODUCTION_BRANCH is the authoritative production branch on the Pages
+# project — it must NOT track preview branches or they'd overwrite the
+# stable production config every time a PR is opened.
 BRANCH="${CF_BRANCH:-main}"
+PRODUCTION_BRANCH="${CF_PRODUCTION_BRANCH:-main}"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 cf()   { curl -sf -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$@"; }
@@ -34,9 +39,10 @@ fi
 [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && die "CLOUDFLARE_ACCOUNT_ID is not set"
 
 echo ""
-echo "  CF Pages → ${CF_PROJECT}  (${CLOUDFLARE_ACCOUNT_ID})"
-echo "  Branch   → ${BRANCH}"
-echo "  Site dir → ${SITE_DIR}"
+echo "  CF Pages   → ${CF_PROJECT}  (${CLOUDFLARE_ACCOUNT_ID})"
+echo "  Branch     → ${BRANCH}"
+echo "  Production → ${PRODUCTION_BRANCH}"
+echo "  Site dir   → ${SITE_DIR}"
 echo ""
 
 # ── 1. ensure project exists ──────────────────────────────────────────────────
@@ -48,7 +54,7 @@ else
   info "Project not found — creating..."
   cf -X POST "${CF_API}/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
     -H "Content-Type: application/json" \
-    -d "{\"name\":\"${CF_PROJECT}\",\"production_branch\":\"${BRANCH}\"}" \
+    -d "{\"name\":\"${CF_PROJECT}\",\"production_branch\":\"${PRODUCTION_BRANCH}\"}" \
     > /dev/null
   ok "Project created."
 fi

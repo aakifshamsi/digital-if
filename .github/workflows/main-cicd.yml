@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: "Version bump override (leave blank for auto)"
+        description: "Version bump override (auto = detect from conventional commits)"
         required: false
         type: choice
-        options: ["", "patch", "minor", "major"]
-        default: ""
+        options: ["auto", "patch", "minor", "major"]
+        default: "auto"
 
 concurrency:
   group: cicd-main
@@ -26,6 +26,7 @@ jobs:
     outputs:
       new_tag: ${{ steps.bump.outputs.new_tag }}
       prev_tag: ${{ steps.bump.outputs.prev_tag }}
+      bump:    ${{ steps.bump.outputs.bump }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,7 +67,7 @@ jobs:
           [ -n "$COMMITS" ] || { echo "No new commits since $LATEST — nothing to release."; exit 1; }
 
           FORCE="${{ github.event.inputs.bump }}"
-          if [ -n "$FORCE" ]; then
+          if [ -n "$FORCE" ] && [ "$FORCE" != "auto" ]; then
             BUMP=$FORCE
           elif echo "$COMMITS" | grep -qiE '(BREAKING[[:space:]]CHANGE|^[a-f0-9]+[[:space:]][a-z]+!:)'; then
             BUMP=major
@@ -90,6 +91,7 @@ jobs:
 
       - name: Generate release notes
         id: notes
+        if: steps.bump.outputs.bump != 'none'
         run: |
           LATEST="${{ steps.bump.outputs.prev_tag }}"
           NEW_TAG="${{ steps.bump.outputs.new_tag }}"
@@ -120,6 +122,7 @@ jobs:
           cat /tmp/release-notes.md
 
       - name: Update CHANGELOG.md
+        if: steps.bump.outputs.bump != 'none'
         run: |
           CHANGELOG="projects/dbeaver/CHANGELOG.md"
           NEW_TAG="${{ steps.bump.outputs.new_tag }}"
@@ -147,12 +150,14 @@ jobs:
           git push
 
       - name: Create and push tag
+        if: steps.bump.outputs.bump != 'none'
         run: |
           NEW_TAG="${{ steps.bump.outputs.new_tag }}"
           git tag -a "$NEW_TAG" -m "Release ${NEW_TAG}"
           git push origin "$NEW_TAG"
 
       - name: Upload release notes artifact
+        if: steps.bump.outputs.bump != 'none'
         uses: actions/upload-artifact@v4
         with:
           name: release-notes
@@ -183,6 +188,7 @@ jobs:
 # ── Job: create-release ──────────────────────────────────────────────────────
   create-release:
     needs: [prepare, deploy-cf-pages]
+    if: needs.prepare.outputs.bump != 'none'
     runs-on: ubuntu-latest
     permissions:
       contents: write

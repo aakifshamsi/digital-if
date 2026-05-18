@@ -35,13 +35,13 @@
     <div class="nav-cta">
       <a href="booking.html" class="btn btn-primary">Book Now</a>
     </div>
-    <button class="nav-burger" aria-label="Menu" type="button">
+    <button class="nav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
-<nav class="nav-mobile">
+<nav class="nav-mobile" id="mobile-menu">
   <a href="index.html">Home</a>
   <a href="services.html">Services</a>
   <a href="about.html">About</a>
@@ -71,7 +71,10 @@
         to melt away stress and restore balance — right in the heart of Vancouver.
       </p>
       <div class="hero-actions">
-        <a href="booking.html" class="btn btn-primary" data-edit="heroSlides.0.ctaText" data-edit-attr="text">Book an Appointment</a>
+        <a href="booking.html"
+           class="btn btn-primary"
+           data-edit="heroSlides.0.ctaText"
+           data-edit-href="heroSlides.0.ctaLink">Book an Appointment</a>
         <a href="#" class="btn-simple" data-video-open>▶ Check Video Presentation</a>
       </div>
     </div>
@@ -292,7 +295,7 @@
             <span class="period" data-field="period"></span>
           </div>
           <ul class="price-card-features" data-field="features" data-field-type="features"></ul>
-          <a href="#" class="btn btn-primary" data-field="ctaText"></a>
+          <a href="#" class="btn btn-primary" data-field="ctaText" data-field-href="ctaLink"></a>
         </div>
       </template>
       <!-- Fallback -->
@@ -585,7 +588,9 @@
       <div class="footer-col">
         <h4>Subscribe for the updates!</h4>
         <form class="newsletter-form">
-          <input type="email" placeholder="Your email address" required>
+          <label for="newsletter-email" class="sr-only">Email address</label>
+          <input id="newsletter-email" name="email" type="email"
+                 placeholder="Your email address" autocomplete="email" required>
           <button type="submit">Join &nbsp;→</button>
         </form>
         <p style="font-size:.78rem; color:var(--gray-mid); margin-top:18px; line-height:1.6;">
@@ -595,7 +600,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2024 <span data-edit="settings.brandName">Serenity</span>. All rights reserved.</span>
+      <span>© <span data-year>2024</span> <span data-edit="settings.brandName">Serenity</span>. All rights reserved.</span>
       <span class="footer-powered">
         Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a>
       </span>

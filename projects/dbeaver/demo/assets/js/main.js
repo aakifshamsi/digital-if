@@ -31,6 +31,31 @@
     return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
   }
 
+  // Derive a usable href from a free-form value:
+  //   foo@bar.com           → mailto:foo@bar.com
+  //   (604) 200-1234        → tel:+16042001234 (strip formatting)
+  //   anything else         → unchanged
+  function deriveHref(raw) {
+    if (raw == null) return raw;
+    const s = String(raw).trim();
+    if (!s) return s;
+    if (s.includes('@')) return 'mailto:' + s;
+    // Phone: at least 7 digits after stripping formatting
+    const digits = s.replace(/[^0-9+]/g, '');
+    if (/^\+?\d{7,}$/.test(digits)) return 'tel:' + digits;
+    return s;
+  }
+
+  function applyValueToAnchor(el, val) {
+    // Anchor: keep visible text, derive href from value when href looks like a phone/mailto.
+    const currentHref = el.getAttribute('href') || '';
+    if (currentHref.startsWith('mailto:') || currentHref.startsWith('tel:') ||
+        (typeof val === 'string' && (val.includes('@') || /\d{7,}/.test(val.replace(/\D/g,''))))) {
+      el.setAttribute('href', deriveHref(val));
+    }
+    el.textContent = val;
+  }
+
   function hydrateContent(content) {
     if (!content) return;
 
@@ -40,6 +65,7 @@
       if (val == null) return;
       if (el.tagName === 'IMG') el.setAttribute('src', val);
       else if (el.tagName === 'A' && el.dataset.editAttr === 'href') el.setAttribute('href', val);
+      else if (el.tagName === 'A') applyValueToAnchor(el, val);
       else el.textContent = val;
     });
 
@@ -62,13 +88,14 @@
       if (!Array.isArray(items)) return;
       const tpl = host.querySelector('template');
       if (!tpl) return;
-      // Remove existing rendered nodes (keep template)
+      // Remove existing rendered nodes (keep template + any static fallback)
       host.querySelectorAll('[data-rendered]').forEach(n => n.remove());
       items.forEach(item => {
         const node = tpl.content.firstElementChild.cloneNode(true);
         node.setAttribute('data-rendered', '1');
         renderItem(node, item);
         host.appendChild(node);
+        observeFadeUp(node);
       });
     });
   }
@@ -76,7 +103,8 @@
   function renderItem(node, item) {
     node.querySelectorAll('[data-field]').forEach(el => {
       const key = el.dataset.field;
-      const val = item[key];
+      // Resolve nested paths so data-field="social.facebook" works
+      const val = getPath(item, key);
       if (val == null) return;
       if (el.tagName === 'IMG') el.setAttribute('src', val);
       else if (el.dataset.fieldType === 'href') el.setAttribute('href', val);
@@ -87,12 +115,36 @@
           li.textContent = f;
           el.appendChild(li);
         });
+      } else if (el.tagName === 'A') {
+        applyValueToAnchor(el, val);
       } else {
         el.textContent = val;
       }
     });
-    // Toggle "active" class on price-card when item.isActive
+    // Companion href binding: data-field-href="path.to.link" sets the href
+    // alongside whatever data-field set as text/src.
+    node.querySelectorAll('[data-field-href]').forEach(el => {
+      const v = getPath(item, el.dataset.fieldHref);
+      if (v) el.setAttribute('href', v);
+    });
     if (item.isActive && node.classList.contains('price-card')) node.classList.add('active');
+  }
+
+  /* ── Intersection Observer: fade-up (shared, reusable) ── */
+  const fadeObserver = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); fadeObserver.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 })
+    : null;
+  function observeFadeUp(root) {
+    if (!fadeObserver) return;
+    const target = root || document;
+    if (target.classList && target.classList.contains('fade-up')) fadeObserver.observe(target);
+    if (target.querySelectorAll) {
+      target.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+    }
   }
 
   /* ── Load saved content + theme on init ── */
@@ -104,6 +156,7 @@
   } catch (err) {
     console.warn('[dh-beaver] failed to load saved state:', err);
   }
+  observeFadeUp(document);
 
   /* ── Live preview from editor (postMessage) ── */
   window.addEventListener('message', (e) => {
@@ -123,33 +176,25 @@
   /* ── Mobile Nav ── */
   const burger    = document.querySelector('.nav-burger');
   const mobileNav = document.querySelector('.nav-mobile');
-  if (burger && mobileNav) {
-    burger.addEventListener('click', () => {
-      mobileNav.classList.toggle('open');
-      const spans = burger.querySelectorAll('span');
-      const open = mobileNav.classList.contains('open');
+  function setMenuOpen(open) {
+    if (!burger || !mobileNav) return;
+    mobileNav.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const spans = burger.querySelectorAll('span');
+    if (spans.length >= 3) {
       spans[0].style.transform = open ? 'rotate(45deg) translate(5px,5px)' : '';
       spans[1].style.opacity   = open ? '0' : '';
       spans[2].style.transform = open ? 'rotate(-45deg) translate(5px,-5px)' : '';
-      document.body.style.overflow = open ? 'hidden' : '';
+    }
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  if (burger && mobileNav) {
+    burger.addEventListener('click', () => {
+      setMenuOpen(!mobileNav.classList.contains('open'));
     });
     mobileNav.querySelectorAll('a').forEach(a =>
-      a.addEventListener('click', () => {
-        mobileNav.classList.remove('open');
-        document.body.style.overflow = '';
-      })
+      a.addEventListener('click', () => setMenuOpen(false))
     );
-  }
-
-  /* ── Intersection Observer: fade-up ── */
-  const fadeEls = document.querySelectorAll('.fade-up');
-  if (fadeEls.length) {
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-      });
-    }, { threshold: 0.12 });
-    fadeEls.forEach(el => obs.observe(el));
   }
 
   /* ── Active nav link ── */
@@ -239,6 +284,11 @@
     t.style.opacity = '1';
     setTimeout(() => { t.style.opacity = '0'; }, 4200);
   }
+
+  /* ── Dynamic year ── */
+  document.querySelectorAll('[data-year]').forEach(el => {
+    el.textContent = new Date().getFullYear();
+  });
 
   /* ── Counter animation ── */
   function animateCounter(el) {

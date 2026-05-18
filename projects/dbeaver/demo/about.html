@@ -27,10 +27,10 @@
       <li><a href="contact.html">Contact</a></li>
     </ul>
     <div class="nav-cta"><a href="booking.html" class="btn btn-primary">Book Now</a></div>
-    <button class="nav-burger" aria-label="Menu" type="button"><span></span><span></span><span></span></button>
+    <button class="nav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" type="button"><span></span><span></span><span></span></button>
   </div>
 </header>
-<nav class="nav-mobile">
+<nav class="nav-mobile" id="mobile-menu">
   <a href="index.html">Home</a><a href="services.html">Services</a>
   <a href="about.html">About</a><a href="contact.html">Contact</a>
   <a href="booking.html" class="btn btn-primary">Book Now</a>
@@ -73,7 +73,22 @@
       <h2 class="fade-up">Meet the Team</h2>
       <div class="divider"></div>
     </div>
-    <div class="team-grid">
+    <div class="team-grid" data-repeat="team">
+      <template>
+        <div class="team-card fade-up">
+          <img data-field="image" class="team-photo" loading="lazy" alt="">
+          <div class="team-card-overlay">
+            <div class="team-name" data-field="name"></div>
+            <div class="team-role" data-field="role"></div>
+          </div>
+          <div class="team-card-social">
+            <a href="#" data-field="social.facebook"  data-field-type="href" aria-label="Facebook">f</a>
+            <a href="#" data-field="social.twitter"   data-field-type="href" aria-label="Twitter">t</a>
+            <a href="#" data-field="social.instagram" data-field-type="href" aria-label="Instagram">ig</a>
+          </div>
+        </div>
+      </template>
+      <!-- Fallback (shown if no saved content) -->
       <div class="team-card fade-up">
         <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500&q=85" alt="Maya Chen" class="team-photo" loading="lazy">
         <div class="team-card-overlay">
@@ -143,7 +158,7 @@
 <footer class="site-footer" id="footer">
   <div class="container">
     <div class="footer-bottom" style="border-top:none; padding-top:40px">
-      <span>© 2024 <span data-edit="settings.brandName">Serenity</span></span>
+      <span>© <span data-year>2024</span> <span data-edit="settings.brandName">Serenity</span></span>
       <span class="footer-powered">Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a></span>
     </div>
   </div>

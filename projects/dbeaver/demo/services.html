@@ -30,12 +30,12 @@
     <div class="nav-cta">
       <a href="booking.html" class="btn btn-primary">Book Now</a>
     </div>
-    <button class="nav-burger" aria-label="Menu" type="button">
+    <button class="nav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" type="button">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
-<nav class="nav-mobile">
+<nav class="nav-mobile" id="mobile-menu">
   <a href="index.html">Home</a>
   <a href="services.html">Services</a>
   <a href="about.html">About</a>
@@ -241,13 +241,15 @@
       <div class="footer-col">
         <h4>Subscribe for the updates!</h4>
         <form class="newsletter-form">
-          <input type="email" placeholder="Your email address" required>
+          <label for="newsletter-email-services" class="sr-only">Email address</label>
+          <input id="newsletter-email-services" name="email" type="email"
+                 placeholder="Your email address" autocomplete="email" required>
           <button type="submit">Join &nbsp;→</button>
         </form>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2024 <span data-edit="settings.brandName">Serenity</span></span>
+      <span>© <span data-year>2024</span> <span data-edit="settings.brandName">Serenity</span></span>
       <span class="footer-powered">Website by <a href="https://digitalhands.in" target="_blank" rel="noopener noreferrer">DigitalHands.in</a></span>
     </div>
   </div>

@@ -82,6 +82,15 @@ a:hover { color: var(--gold-bright); }
 }
 .skip-link:focus { left: 16px; top: 16px; }
 
+/* ── Screen-reader only (a11y) ── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+
 /* ── Section label ── */
 .section-label {
   display: inline-block;
