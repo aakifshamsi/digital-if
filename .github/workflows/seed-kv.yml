@@ -1,0 +1,43 @@
+name: Seed KV (Admin Bootstrap)
+
+# Run manually from the Actions tab to create the initial admin user and
+# demo client records in the Cloudflare KV namespace.
+#
+# Required secrets (Settings → Secrets → Actions):
+#   CLOUDFLARE_API_TOKEN   — CF API token with KV write permissions
+#   CLOUDFLARE_ACCOUNT_ID  — CF account ID
+#   DH_KV_NAMESPACE_ID     — KV namespace ID (from wrangler.toml)
+#   DH_ADMIN_EMAIL         — admin login email (default: admin@digitalhands.in)
+#   DH_ADMIN_PASSWORD      — admin login password (required — no default)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Overwrite existing records (re-sets passwords)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Seed KV namespace
+        env:
+          CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DH_KV_NAMESPACE_ID:    ${{ secrets.DH_KV_NAMESPACE_ID }}
+          DH_ADMIN_EMAIL:        ${{ secrets.DH_ADMIN_EMAIL }}
+          DH_ADMIN_PASSWORD:     ${{ secrets.DH_ADMIN_PASSWORD }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="--force"; fi
+          bash projects/dbeaver/scripts/seed-kv.sh $ARGS

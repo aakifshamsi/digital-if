@@ -51,8 +51,21 @@
     <div class="panel">
       <div data-whatsnew-mount data-whatsnew-limit="50" data-whatsnew-base="./"></div>
     </div>
-    <a href="admin/dashboard.html" class="back-link">← Back to dashboard</a>
+    <a href="admin/dashboard.html" class="back-link" id="back-link">← Back to dashboard</a>
   </div>
+  <script>
+    (function () {
+      var back = document.getElementById('back-link');
+      back.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'admin/dashboard.html';
+        }
+      });
+    })();
+  </script>
   <script src="admin/assets/js/whatsnew.js"></script>
 </body>
 </html>

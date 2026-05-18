@@ -420,7 +420,9 @@ function populateClientSelector() {
     const c = window.getClients().find(x => x.id === currentClientId);
     document.getElementById('editor-title').textContent = 'Site Editor — ' + (c ? c.name : '');
     loadClientData();
-    iframe.src = '../templates/' + currentTemplate() + '/' + currentPage + '?client=' + currentClientId;
+    const tpl = currentTemplate();
+    iframe.src = '../templates/' + tpl + '/' + currentPage + '?client=' + currentClientId;
+    document.getElementById('frame-url').textContent = 'templates/' + tpl + '/' + currentPage;
   });
 }
 

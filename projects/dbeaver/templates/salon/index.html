@@ -133,7 +133,7 @@
         <h2>Ready for a New Look?</h2>
         <p>First-time guests get 15% off their first colour or cut.</p>
       </div>
-      <a href="../spa/booking.html" class="btn btn-primary">Book Now</a>
+      <a href="../spa/booking.html" id="book-now-link" class="btn btn-primary">Book Now</a>
     </div>
   </div>
 </section>
@@ -150,5 +150,14 @@
 </footer>
 
 <script src="../spa/assets/js/main.js"></script>
+<script>
+(function () {
+  var c = new URLSearchParams(location.search).get('client');
+  if (c) {
+    var link = document.getElementById('book-now-link');
+    if (link) link.href += '?client=' + encodeURIComponent(c);
+  }
+})();
+</script>
 </body>
 </html>

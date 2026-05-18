@@ -85,7 +85,16 @@ fi
 # create the namespace, then inject [[kv_namespaces]] into wrangler.toml for
 # this deploy. Idempotent — skips injection if the block already exists.
 TOML="${SITE_DIR}/wrangler.toml"
-if ! grep -q '^\[\[kv_namespaces\]\]' "$TOML"; then
+# Check specifically for DH_KV binding, not just any [[kv_namespaces]] block.
+has_dh_kv_binding() {
+  awk '
+    /^\[\[kv_namespaces\]\]/ {in_block=1; next}
+    /^\[\[/ {in_block=0}
+    in_block && $0 ~ /^binding[[:space:]]*=[[:space:]]*"DH_KV"/ {found=1}
+    END {exit found ? 0 : 1}
+  ' "$1"
+}
+if ! has_dh_kv_binding "$TOML"; then
   info "KV binding not in wrangler.toml — bootstrapping..."
   KV_OUT=$(CLOUDFLARE_PAGES_PROJECT="${CF_PROJECT}" \
     bash "${SCRIPT_DIR}/kv-bootstrap.sh" 2>&1) || die "kv-bootstrap failed: $KV_OUT"

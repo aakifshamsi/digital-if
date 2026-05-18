@@ -12,9 +12,9 @@
   // Showcase mode: template page visited without a ?client= param.
   // Skip all hydration so the template's static HTML defaults show through.
   const isShowcase = !clientId && !!document.body.dataset.templateId;
-  const effectiveClientId = clientId || 'cli_001';
-  const CONTENT_KEY = 'dh_content_' + effectiveClientId;
-  const THEME_KEY   = 'dh_theme_'   + effectiveClientId;
+  const effectiveClientId = clientId || null;
+  const CONTENT_KEY = effectiveClientId ? ('dh_content_' + effectiveClientId) : null;
+  const THEME_KEY   = effectiveClientId ? ('dh_theme_'   + effectiveClientId) : null;
 
   /* ── Apply theme (CSS custom properties) ── */
   function applyTheme(theme) {
@@ -153,7 +153,7 @@
 
   /* ── Load saved content + theme: localStorage cache → render → API refresh ── */
   // Sync path: paint from cache (or defaults) immediately, no FOUC.
-  if (!isShowcase) {
+  if (!isShowcase && effectiveClientId) {
     try {
       const cachedTheme   = JSON.parse(localStorage.getItem(THEME_KEY)   || 'null');
       const cachedContent = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null');
@@ -188,7 +188,7 @@
       })
       .catch(() => { /* ignore */ });
   }
-  if (!isShowcase) refreshFromApi();
+  if (!isShowcase && effectiveClientId) refreshFromApi();
 
   /* ── Live preview from editor (postMessage) ── */
   window.addEventListener('message', (e) => {

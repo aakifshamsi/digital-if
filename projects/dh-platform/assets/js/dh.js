@@ -53,8 +53,11 @@
     window.addEventListener('scroll', updateScrolled, { passive: true });
   }
 
+  const reduceMotion =
+    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   /* ─── Fade-up observer ─────────────────────────────── */
-  if ('IntersectionObserver' in window) {
+  if (!reduceMotion && 'IntersectionObserver' in window) {
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -65,7 +68,7 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
   } else {
-    // Old browsers: just show everything
+    // Reduced-motion users and old browsers: show immediately
     document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
   }
 
@@ -79,7 +82,7 @@
       if (!target) return;
       e.preventDefault();
       const top = target.getBoundingClientRect().top + window.scrollY - navHeight() - 8;
-      window.scrollTo({ top, behavior: 'smooth' });
+      window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   });
 

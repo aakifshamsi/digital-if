@@ -174,8 +174,14 @@ p  { margin-bottom: 1rem; color: var(--text-mid); }
     transform: translateY(-110%);
     transition: transform .28s ease;
     z-index: 10;
+    visibility: hidden;
+    pointer-events: none;
   }
-  .dh-nav.menu-open .nav-links { transform: translateY(0); }
+  .dh-nav.menu-open .nav-links {
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
   .dh-nav .nav-links a { padding: 13px 12px; font-size: .98rem; border-radius: 8px; }
 
   /* Mobile CTA stays visible (Sign In hidden, Get Started kept) */
