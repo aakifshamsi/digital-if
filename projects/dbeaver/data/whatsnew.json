@@ -1,0 +1,39 @@
+{
+  "_comment": "User-facing changelog — surfaces feature-level updates inside the app. Newest first. Keep entries focused on things users care about (new features, template additions, UX improvements). Skip internal refactors, dep bumps, CI plumbing.",
+  "entries": [
+    {
+      "date": "2026-05-18",
+      "version": "0.3.0",
+      "tag": "new",
+      "title": "Choose your template — CV, Spa, Salon, or Yoga",
+      "items": [
+        "DH Beaver now leads with a CV / Portfolio template — the fastest way to publish a personal site.",
+        "Three more templates available: Spa & Wellness, Hair Salon, Yoga Studio.",
+        "New clients can pick their template at signup; existing clients keep their current one.",
+        "Coming soon: AI-assisted content suggestions for your hero, bio, and services."
+      ]
+    },
+    {
+      "date": "2026-05-18",
+      "version": "0.2.0",
+      "tag": "improved",
+      "title": "Your edits now sync across devices",
+      "items": [
+        "Save once in the admin editor — changes appear on your live site immediately, on any browser.",
+        "Sign in works from any device; sessions stay alive for 7 days.",
+        "If our backend is unreachable, edits still save locally and sync automatically when you're back online."
+      ]
+    },
+    {
+      "date": "2026-04-30",
+      "version": "0.1.0",
+      "tag": "launch",
+      "title": "Welcome to DH Beaver",
+      "items": [
+        "Live admin editor: edit your brand, services, team, pricing, and theme without writing code.",
+        "Mobile-friendly responsive site templates with a polished default design.",
+        "Client portal so your customers can view their site stats and request changes."
+      ]
+    }
+  ]
+}

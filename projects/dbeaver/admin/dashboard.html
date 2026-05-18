@@ -167,35 +167,14 @@
         </div>
       </div>
 
-      <!-- Platform overview -->
+      <!-- What's New — surfaces user-facing release notes from data/whatsnew.json -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">🚀 Platform Overview — Spa &amp; Wellness Template v1.0</span>
-          <span class="badge badge-green">Active</span>
+          <span class="card-title">✨ What's New</span>
+          <a href="../whatsnew.html" style="font-size:.78rem; color:var(--blue-light);">View all →</a>
         </div>
         <div class="card-body">
-          <div class="three-col" style="margin-bottom:20px">
-            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center;">
-              <div style="font-size:2rem; margin-bottom:.4rem">🎨</div>
-              <div style="font-weight:600; margin-bottom:.3rem">Jacqueline-Style Template</div>
-              <div style="font-size:.8rem; color:var(--text-dim);">5-page spa website with booking, services, about, contact</div>
-            </div>
-            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center;">
-              <div style="font-size:2rem; margin-bottom:.4rem">🤖</div>
-              <div style="font-weight:600; margin-bottom:.3rem">AI Content Ready</div>
-              <div style="font-size:.8rem; color:var(--text-dim);">Auto-generate copy, meta tags, and service descriptions</div>
-            </div>
-            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; text-align:center;">
-              <div style="font-size:2rem; margin-bottom:.4rem">🌐</div>
-              <div style="font-weight:600; margin-bottom:.3rem">Deploy Anywhere</div>
-              <div style="font-size:.8rem; color:var(--text-dim);">GitHub Pages, Linux shared hosting, or Netlify</div>
-            </div>
-          </div>
-          <div style="background:rgba(74,108,247,.08); border:1px solid rgba(74,108,247,.2); border-radius:8px; padding:16px 20px; font-size:.85rem; color:var(--text-mid);">
-            💡 <strong style="color:var(--text)">Next steps:</strong>
-            Add client massagedowntownvancouver.com → Customize template → Deploy to GitHub Pages or cPanel hosting.
-            <a href="editor.html" style="color:var(--blue-light); margin-left:8px;">Open Editor →</a>
-          </div>
+          <div data-whatsnew-mount data-whatsnew-limit="3"></div>
         </div>
       </div>
 
@@ -204,6 +183,7 @@
 </div>
 
 <script src="assets/js/admin.js"></script>
+<script src="assets/js/whatsnew.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const clients = window.getClients();
