@@ -3,6 +3,12 @@
 ## v0.2.0 — 2026-05-18
 ## v0.2.1 — 2026-05-18
 ## v0.3.0 — 2026-05-18
+## v0.3.1 — 2026-05-18
+
+### Other
+- Sprint 1.4: client magic links and Cloudflare deploy fix (816e240)
+---
+
 
 ### Features
 - feat: Sprint 1.3 — CV-first templates, dh-platform UX, What's New widget (#5) (db989f0)
