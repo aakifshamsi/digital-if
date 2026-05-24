@@ -7,8 +7,13 @@
 # Required env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, DH_KV_NAMESPACE_ID
 # Optional env: DH_ADMIN_EMAIL    (default: admin@digitalhands.in)
 #               DH_ADMIN_PASSWORD (default: random — printed at end)
-#               DH_CLIENT_EMAIL   (default: client@serenityspa.ca)
+#               DH_CLIENT_NAME    (default: "Sabi's Wellness Spa" — business name)
+#               DH_CLIENT_CONTACT (default: "Sabi" — contact person name)
+#               DH_CLIENT_EMAIL   (default: sabi@example.com — used for login)
 #               DH_CLIENT_PASS    (default: random — printed at end)
+#               DH_CLIENT_PHONE   (default: "" — empty)
+#               DH_CLIENT_DOMAIN  (default: "" — empty, set later via admin portal)
+#               DH_CLIENT_TEMPLATE (default: "spa")
 
 set -euo pipefail
 
@@ -88,8 +93,14 @@ ADMIN_EMAIL="${DH_ADMIN_EMAIL:-admin@digitalhands.in}"
 ADMIN_PASS="${DH_ADMIN_PASSWORD:-$(random_pw)}"
 ADMIN_PASS_PRINTED="${DH_ADMIN_PASSWORD:+(from env)}"
 
+# ── client configuration (all fields can be overridden via env vars) ────────────
 CLIENT_ID="cli_001"
-CLIENT_EMAIL="${DH_CLIENT_EMAIL:-client@serenityspa.ca}"
+CLIENT_NAME="${DH_CLIENT_NAME:-Sabi's Wellness Spa}"
+CLIENT_CONTACT="${DH_CLIENT_CONTACT:-Sabi}"
+CLIENT_EMAIL="${DH_CLIENT_EMAIL:-sabi@example.com}"
+CLIENT_PHONE="${DH_CLIENT_PHONE:-}"
+CLIENT_DOMAIN="${DH_CLIENT_DOMAIN:-}"
+CLIENT_TEMPLATE="${DH_CLIENT_TEMPLATE:-spa}"
 CLIENT_PASS="${DH_CLIENT_PASS:-$(random_pw)}"
 CLIENT_PASS_PRINTED="${DH_CLIENT_PASS:+(from env)}"
 
@@ -116,12 +127,12 @@ if [ "$FORCE" -eq 1 ] || ! kv_exists "client:${CLIENT_ID}"; then
   CLIENT_RECORD=$(cat <<EOF
 {
   "id": "${CLIENT_ID}",
-  "name": "Serenity Spa & Massage",
-  "contact": "Maya Chen",
-  "email": "maya@serenityspa.ca",
-  "phone": "(604) 200-1234",
-  "domain": "massagedowntownvancouver.com",
-  "template": "spa-massage",
+  "name": "${CLIENT_NAME}",
+  "contact": "${CLIENT_CONTACT}",
+  "email": "${CLIENT_EMAIL}",
+  "phone": "${CLIENT_PHONE}",
+  "domain": "${CLIENT_DOMAIN}",
+  "template": "${CLIENT_TEMPLATE}",
   "status": "active",
   "plan": "Professional",
   "created": "2024-01-15",

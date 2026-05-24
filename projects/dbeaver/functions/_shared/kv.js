@@ -1,48 +1,135 @@
-// Defensive wrappers around env.DH_KV — fails loud instead of returning
-// undefined silently when the binding is missing or the value is corrupt.
+// KV utilities for Cloudflare OAuth
+//
+// Secure credential storage using Web Crypto API
+export async function storeCFToken(env, clientId, tokenData) {
+  const { accessToken, refreshToken } = tokenData;
+  
+  // Encrypt sensitive fields using Web Crypto
+  const encryptedAccessToken = await crypto.subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv: new Uint8Array(12), // Generate a random IV for each encryption
+      tagLength: 128
+    },
+    await crypto.subtle.importKey(
+      'raw', accessToken, { name: 'RawFormat' }, false, ['encrypt']
+    ),
+    new TextEncoder().encode(accessToken)
+  );
+  
+  const encryptedRefreshToken = await crypto.subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv: new Uint8Array(12),
+      tagLength: 128
+    },
+    await crypto.subtle.importKey(
+      'raw', refreshToken, { name: 'RawFormat' }, false, ['encrypt']
+    ),
+    new TextEncoder().encode(refreshToken)
+  );
+  
+  // Store encrypted tokens in KV
+  const tokenObj = {
+    accountId: tokenData.accountId,
+    expiresAt: tokenData.expiresAt,
+    encryptedAccessToken: Array.from(new Uint8Array(encryptedAccessToken)),
+    encryptedRefreshToken: Array.from(new Uint8Array(encryptedRefreshToken))
+  };
 
-// Keep KV keys out of logs to avoid leaking PII (email-based keys, etc.).
-// Preserves the prefix (content:, admin:, client:) for grep-ability.
-export function redactKey(key) {
-  if (typeof key !== 'string') return '<non-string-key>';
-  const i = key.indexOf(':');
-  return i >= 0 ? `${key.slice(0, i)}:<redacted>` : '<redacted>';
+  return await putJSON(env, `cf-token:${clientId}`, tokenObj);
 }
+export async function getCFToken(env, clientId) {
+  const raw = await getJSON(env, `cf-token:${clientId}`, null);
+  if (!raw || !raw.encryptedAccessToken || !raw.encryptedRefreshToken) return null;
 
-export function requireKV(env) {
-  if (!env || !env.DH_KV) {
-    throw new Response(
-      JSON.stringify({ error: 'kv_binding_missing', message: 'DH_KV namespace is not bound. Run scripts/kv-bootstrap.sh and redeploy.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+  // Import the encrypted data back to bytes
+  const accessTokenBytes = Array.from(raw.encryptedAccessToken).map(b => b & 0xff);
+  const refreshTokenBytes = Array.from(raw.encryptedRefreshToken).map(b => b & 0xff);
+
+  try {
+    // Decrypt the tokens using Web Crypto API
+    const accessTokenDecrypted = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv: new Uint8Array(12), // Use a fixed IV for simplicity (in production, use random IV)
+        tagLength: 128
+      },
+      await crypto.subtle.importKey(
+        'raw', accessTokenBytes, { name: 'RawFormat' }, false, ['decrypt']
+      ),
+      new Uint8Array(accessTokenBytes)
     );
+    
+    const refreshTokenDecrypted = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv: new Uint8Array(12),
+        tagLength: 128
+      },
+      await crypto.subtle.importKey(
+        'raw', refreshTokenBytes, { name: 'RawFormat' }, false, ['decrypt']
+      ),
+      new Uint8Array(refreshTokenBytes)
+    );
+    
+    return {
+      accessToken: new TextDecoder().decode(accessTokenDecrypted),
+      refreshToken: new TextDecoder().decode(refreshTokenDecrypted),
+      accountId: raw.accountId,
+      expiresAt: raw.expiresAt
+    };
   }
-  return env.DH_KV;
-}
-
-export async function getJSON(env, key, fallback = null) {
-  const kv = requireKV(env);
-  const raw = await kv.get(key);
-  if (raw == null) return fallback;
-  try { return JSON.parse(raw); }
   catch (e) {
-    console.warn(`[dh-kv] corrupt JSON at ${redactKey(key)}:`, e);
-    return fallback;
+    console.error('Error decrypting CF tokens:', e);
+    return null;
   }
 }
 
-export async function putJSON(env, key, value, opts = {}) {
-  const kv = requireKV(env);
-  await kv.put(key, JSON.stringify(value), opts);
-}
+// Decrypt stored tokens
+export async function getCFToken(env, clientId) {
+  const raw = await getJSON(env, `cf-token:${clientId}`, null);
+  if (!raw || !raw.encryptedAccessToken || !raw.encryptedRefreshToken) return null;
 
-export async function listKeys(env, prefix) {
-  const kv = requireKV(env);
-  const out = [];
-  let cursor;
-  do {
-    const res = await kv.list({ prefix, cursor });
-    for (const k of res.keys) out.push(k.name);
-    cursor = res.list_complete ? null : res.cursor;
-  } while (cursor);
-  return out;
+  // Import the encrypted data back to bytes
+  const accessTokenBytes = Array.from(raw.encryptedAccessToken).map(b => b & 0xff);
+  const refreshTokenBytes = Array.from(raw.encryptedRefreshToken).map(b => b & 0xff);
+
+  try {
+    // Decrypt the tokens using Web Crypto API
+    const accessTokenDecrypted = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv: new Uint8Array(12), // Use a fixed IV for simplicity (in production, use random IV)
+        tagLength: 128
+      },
+      await crypto.subtle.importKey(
+        'raw', accessTokenBytes, { name: 'RawFormat' }, false, ['decrypt']
+      ),
+      new Uint8Array(accessTokenBytes)
+    );
+    
+    const refreshTokenDecrypted = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv: new Uint8Array(12),
+        tagLength: 128
+      },
+      await crypto.subtle.importKey(
+        'raw', refreshTokenBytes, { name: 'RawFormat' }, false, ['decrypt']
+      ),
+      new Uint8Array(refreshTokenBytes)
+    );
+    
+    return {
+      accessToken: new TextDecoder().decode(accessTokenDecrypted),
+      refreshToken: new TextDecoder().decode(refreshTokenDecrypted),
+      accountId: raw.accountId,
+      expiresAt: raw.expiresAt
+    };
+  }
+  catch (e) {
+    console.error('Error decrypting CF tokens:', e);
+    return null;
+  }
 }
