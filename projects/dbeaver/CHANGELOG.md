@@ -1,6 +1,12 @@
 # Changelog
 ## v1.6.0 — 2026-05-24
 ## v1.7.1 — 2026-05-24
+## v1.7.2 — 2026-05-24
+
+### Documentation
+- docs(sprints): Add comprehensive KiloCode handoff prompts for 1.8 & 1.9 (325fe1f)
+---
+
 
 ### Documentation
 - docs(sprints): Complete Sprint 1.7, add Sprint 1.8-1.9 detailed plans (a882cf1)
