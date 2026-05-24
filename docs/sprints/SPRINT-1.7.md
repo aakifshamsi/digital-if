@@ -1,8 +1,9 @@
-# Sprint 1.7 — Deploy dh-platform to digitalhands.in
+# Sprint 1.7 — Deploy dh-platform to digitalhands.in ✅ COMPLETE
 
-**Status:** Ready to start  
-**Duration:** 30 min (Ministral 3.3B)  
-**Branch:** claude/sprint-1.7  
+**Status:** ✅ COMPLETE (2026-05-24)  
+**Duration:** 30 min (Ministral 3.3B) → Actual: ~45 min with CodeRabbit review  
+**Branch:** claude/sprint-1.7 (merged to main)  
+**Tag:** v1.7.0  
 **Model:** Ministral 3 3B (fast + tool_use training)
 
 ---
