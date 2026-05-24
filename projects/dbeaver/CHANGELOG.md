@@ -1,4 +1,10 @@
 # Changelog
+## v1.6.0 — 2026-05-24
+
+### Features
+- feat(Sprint 1.7): Add dh-platform auto-deploy workflow (#7) (658febd)
+---
+
 
 ## [1.7.0] — 2026-05-24
 
