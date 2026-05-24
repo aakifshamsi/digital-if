@@ -4,50 +4,62 @@ This document outlines the current purpose and state of the repository.
 
 ## Repository Purpose
 
-[Clearly state the primary purpose of this repository. What problem does it solve? What is its main function?]
+**digitalhands** is a multi-tenant SaaS platform for digital service providers (salons, yoga studios, consultants, etc.). It provides:
+- Client management and magic link authentication
+- Admin dashboard for managing clients
+- Cloudflare OAuth integration for account connection
+- Per-client white-label templates (salon, spa, yoga, CV, etc.)
+- Automated deployment to Cloudflare Pages via GitHub Actions
 
 ## Current State
 
-[Describe the current development stage of the project. For example:
-- **Alpha:** Early development, core features are being implemented, unstable.
-- **Beta:** Feature complete, undergoing testing and bug fixing, more stable.
-- **Release Candidate:** Stable, ready for release, final testing.
-- **Production/Stable:** Actively used, maintained, receiving updates and bug fixes.
-- **Archived:** No longer actively developed, read-only.]
+**Beta** — Core infrastructure complete, moving toward production launch (May 31, 2026).
+
+**Active Sprints:**
+- Sprint 1.6: ✅ COMPLETE — Cloudflare OAuth integration
+- Sprint 1.7: ✅ COMPLETE — dh-platform auto-deploy workflow
+- Sprint 1.8: 🔄 PENDING — Magic link generation and client self-edit
+- Sprint 1.9: 📋 PLANNED — Multi-tenant infrastructure (per-client subdomains)
 
 ## Key Features
 
-* [List the main features or functionalities of the project.]
-* [Feature 2]
-* [Feature 3]
+* Admin dashboard for managing clients and generating magic links
+* Client portal with self-edit capability (email, phone)
+* Cloudflare OAuth for account connection
+* Multiple white-label templates (salon, spa, yoga, CV)
+* KV-based session management with automatic token refresh
+* GitHub Actions auto-deployment to Cloudflare Pages
+* Security: PBKDF2 hashing, HttpOnly cookies, CSRF protection, minimal IAM permissions
 
 ## Known Issues
 
-* [List any significant known bugs or limitations.]
-* [Issue 2]
+* None currently blocking release
 
 ## Tasks
 
-### Immediate Tasks
-* [List tasks that need to be addressed right away.]
-* [Immediate Task 2]
+### Immediate Tasks (This Week)
+* Complete Sprint 1.8: Magic link endpoint + client self-edit UI
+* Complete Sprint 1.9: Multi-tenant subdomains (client-{id}.digitalhands.in)
+* Launch digitalhands.in on May 31, 2026
 
 ### Next Tasks
-* [List tasks that are planned for the near future.]
-* [Next Task 2]
+* Email notifications for magic links
+* Analytics dashboard (admin view)
+* Stripe integration for subscriptions (2.0 release)
 
 ### Blocked Tasks
-* [List any tasks that are currently blocked and the reasons why.]
-* [Blocked Task 2]
+* Sprint 1.9 blocked until Sprint 1.8 merges to main
 
 ## Handover Information
 
 ### Key Commands
-* [List essential commands for running, building, testing, or deploying the project. For example:
-    * `npm install`: To install project dependencies.
-    * `npm start`: To run the development server.
-    * `npm test`: To run unit tests.
-    * `docker-compose up`: To start services using Docker Compose.]
+* `npm install`: Install dependencies
+* `npm test`: Run test suite  
+* `npm run build`: Build static assets
+* `wrangler deploy`: Deploy to Cloudflare Pages (dbeaver project)
+* `wrangler kv:key list`: View KV namespace contents
+* `gh pr create`: Create pull request from feature branch
+* `git tag -a v1.X.0`: Tag release version
 * [Command 2]
 
 ### Project Structure

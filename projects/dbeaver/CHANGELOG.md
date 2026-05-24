@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.0] — 2026-05-24
+
+### Infrastructure
+- GitHub Actions workflow for automated dh-platform deployment to Cloudflare Pages
+- Auto-deploy triggered on changes to `projects/dh-platform/**`
+- Security hardening: minimal permissions, concurrency control, pinned action hashes, credential isolation
+
+---
+
 ## v1.6 — (In Progress)
 
 ### Features
