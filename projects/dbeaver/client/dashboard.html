@@ -167,6 +167,23 @@
         </div>
       </div>
 
+      <div class="portal-card" style="margin-bottom:16px">
+        <div class="portal-card-header">
+          <span class="portal-card-title">☁️ Cloudflare Connection</span>
+          <span id="cf-status-badge" style="background:#f5f0e8; color:#1a3a2a; font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:20px;">Not Connected</span>
+        </div>
+        <div class="portal-card-body">
+          <div id="cf-status-text" style="font-size:.82rem; color:#666; margin-bottom:14px;">
+            Connect your Cloudflare account to allow DH to manage DNS records and Pages projects on your behalf.
+          </div>
+          <button id="cf-connect-btn" type="button"
+            style="padding:10px; background:#1a3a2a; color:#f5f0e8; border:none; border-radius:7px; font-size:.88rem; font-weight:600; cursor:pointer;">
+            Connect Cloudflare
+          </button>
+          <div id="cf-msg" style="font-size:.78rem; color:#666; min-height:1em;"></div>
+        </div>
+      </div>
+
     <div class="portal-card" style="margin-bottom:16px">
       <div class="portal-card-header">
         <span class="portal-card-title">🔗 Connect Your Domain</span>
@@ -526,6 +543,38 @@
         domainSubmit.disabled = false;
       }
     });
+  }
+
+  // Cloudflare connection: GET /api/auth/cf-oauth
+  const cfConnectBtn = document.getElementById('cf-connect-btn');
+  if (cfConnectBtn) {
+    cfConnectBtn.addEventListener('click', async function() {
+      const msg = document.getElementById('cf-msg');
+      const badge = document.getElementById('cf-status-badge');
+      cfConnectBtn.disabled = true;
+      if (msg) { msg.style.color = '#666'; msg.textContent = 'Redirecting to Cloudflare OAuth…'; }
+      try {
+        await fetch('/api/auth/cf-oauth', { credentials: 'include' });
+        window.location.href = '/client/dashboard.html?cf=connected';
+      } catch (e) {
+        console.error(e);
+        if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Network error — try again.'; }
+        cfConnectBtn.disabled = false;
+      }
+    });
+  }
+
+  // Check CF OAuth status on page load
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('cf') === 'connected') {
+    const badge = document.getElementById('cf-status-badge');
+    const text = document.getElementById('cf-status-text');
+    const msg = document.getElementById('cf-msg');
+    if (badge) badge.textContent = 'Connected';
+    if (badge) badge.style.background = '#dcfce7';
+    if (badge) badge.style.color = '#166534';
+    if (text) text.textContent = 'Your Cloudflare account is connected. DH can now manage DNS records and Pages projects on your behalf.';
+    if (msg) msg.textContent = '';
   }
 
 })();

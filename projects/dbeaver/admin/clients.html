@@ -151,12 +151,13 @@ function renderClients() {
         Email: <span style="color:var(--cyan)">${c.login.email}</span><br>
         Password: <span style="color:var(--cyan)">${c.login.password}</span>
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap">
+       <div style="display:flex; gap:8px; flex-wrap:wrap">
         <span class="badge badge-blue">${c.plan}</span>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="editClient('${c.id}')">Edit</button>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="generateMagicLink('${c.id}')">🔗 Magic link</button>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="copyDemoLink('${c.id}')">👀 Copy demo link</button>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="window.open('../editor.html?client=${c.id}','_blank')">Open Editor</button>
+        <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="connectCloudflare('${c.id}')">☁️ Connect CF</button>
         <button class="topbar-btn" style="padding:5px 12px; font-size:.75rem" onclick="deleteClient('${c.id}')">Delete</button>
       </div>`;
     grid.appendChild(div);
